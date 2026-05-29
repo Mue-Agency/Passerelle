@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const GetGroupDtoIn = z.object({
-  groupId: z.string().cuid(),
+  groupId: z.string().min(1),
 });
 
 export type GetGroupDtoIn = z.output<typeof GetGroupDtoIn>;
