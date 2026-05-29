@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const MessageOut = z.object({
   id:      z.string(),
-  type:    z.enum(["TEXT", "OUTING"]),
+  type:    z.enum(["TEXT", "OUTING", "JOIN"]),
   content: z.string().nullable(),
   sentAt:  z.date(),
   user: z.object({
