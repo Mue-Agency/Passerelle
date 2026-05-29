@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     if (err instanceof Error && err.message === "GROUP_NOT_FOUND") {
       return Response.json({ error: "Groupe introuvable." }, { status: 404 });
     }
+    console.error("[POST /api/users]", err);
     return Response.json({ error: "Erreur serveur." }, { status: 500 });
   }
 }
