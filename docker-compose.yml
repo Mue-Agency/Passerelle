@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: mue-agency
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: Mue-Agency
+      POSTGRES_PASSWORD: Mue-Agency+2026!
+      POSTGRES_DB: passerelle_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - elan_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  elan_postgres_data:
