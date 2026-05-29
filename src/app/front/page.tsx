@@ -47,6 +47,7 @@ export default function FrontPage() {
       return;
     }
 
+    localStorage.setItem("userId", result.data.userId);
     router.push("/front/discu");
   }
 
