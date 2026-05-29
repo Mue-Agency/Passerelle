@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   const parsed = CreateProfileDtoIn.safeParse(body);
 
   if (!parsed.success) {
-    return Response.json({ error: parsed.error.flatten() }, { status: 400 });
+    return Response.json({ error: "Données invalides." }, { status: 400 });
   }
 
   try {
@@ -20,11 +20,13 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       sameSite: "lax",
       path:     "/",
-      maxAge:   60 * 60 * 24 * 30, // 30 jours
+      maxAge:   60 * 60 * 24 * 30,
     });
 
-    const joinMessage = await createJoinMessage({ userId: result.userId, groupId: result.groupId });
-    eventBus.emit(`group:${result.groupId}`, joinMessage);
+    try {
+      const joinMessage = await createJoinMessage({ userId: result.userId, groupId: result.groupId });
+      eventBus.emit(`group:${result.groupId}`, joinMessage);
+    } catch {}
 
     return Response.json(result, { status: 201 });
   } catch (err) {
