@@ -2,7 +2,7 @@ import { z } from "zod";
 import { MessageOut } from "../message.schema";
 
 export const SendMessageDtoIn = z.object({
-  groupId: z.string().cuid(),
+  groupId: z.string().min(1),
   userId:  z.string().cuid(),
   content: z.string().min(1).max(1000),
 });

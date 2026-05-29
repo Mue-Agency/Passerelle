@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const JoinGroupDtoIn = z.object({
-  groupId: z.string().cuid(),
+  groupId: z.string().min(1),
   userId:  z.string().cuid(),
 });
 

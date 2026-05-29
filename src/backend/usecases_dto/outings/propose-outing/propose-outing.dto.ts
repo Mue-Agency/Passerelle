@@ -2,7 +2,7 @@ import { z } from "zod";
 import { MessageOut } from "@/backend/usecases_dto/messages/message.schema";
 
 export const ProposeOutingDtoIn = z.object({
-  groupId:  z.string().cuid(),
+  groupId:  z.string().min(1),
   userId:   z.string().cuid(),
   title:    z.string().min(1).max(100),
   date:     z.coerce.date(),

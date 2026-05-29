@@ -3,7 +3,7 @@ import { z } from "zod";
 export const CreateProfileDtoIn = z.object({
   firstName: z.string().min(1).max(50),
   lastName:  z.string().min(1).max(50),
-  groupId:   z.string().cuid(),
+  groupId:   z.string().min(1),
 });
 
 export type CreateProfileDtoIn = z.output<typeof CreateProfileDtoIn>;
