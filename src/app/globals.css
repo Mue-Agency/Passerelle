@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  /* Votre nouvelle couleur de fond par défaut (Light mode) */
+  --background: #FAF9F5;
   --foreground: #171717;
 }
 
