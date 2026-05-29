@@ -59,6 +59,7 @@ model Message {
 enum MessageType {
   TEXT
   OUTING
+  JOIN
 }
 
 model Outing {

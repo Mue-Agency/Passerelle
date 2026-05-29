@@ -6,6 +6,7 @@ import { configService } from "@/app/services/config.service";
 import { groupsService } from "@/app/services/groups.service";
 import { messagesService } from "@/app/services/messages.service";
 import { useMessages } from "@/app/hooks/useMessages";
+import { outingsService } from "@/app/services/outings.service";
 import type { MessageOut } from "@/backend/usecases_dto/messages";
 
 function formatTime(sentAt: Date | string): string {
@@ -176,8 +177,16 @@ export default function DiscussionPage() {
 }
 
 function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+  if (msg.type === "JOIN") {
+    return (
+      <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 font-medium py-1">
+        {AuthorName(msg.user)} a rejoint le groupe
+      </div>
+    );
+  }
+
   if (msg.type === "OUTING" && msg.outing) {
-    return <OutingCard msg={msg} />;
+    return <OutingCard msg={msg} isMe={isMe} />;
   }
 
   return (
@@ -201,10 +210,35 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
   );
 }
 
-function OutingCard({ msg }: { msg: MessageOut }) {
+function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+  const [participantCount, setParticipantCount] = useState(msg.outing?.participantCount ?? 0);
+  const [isJoined, setIsJoined] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
+
+  useEffect(() => {
+    if (!msg.outing) return;
+    outingsService.getOuting(msg.outing.id).then((result) => {
+      if (result.isOk) {
+        setParticipantCount(result.data.participantCount);
+        setIsJoined(result.data.isParticipant);
+      }
+    });
+  }, [msg.outing?.id]);
+
   if (!msg.outing) return null;
   const { outing } = msg;
-  const spotsLeft = outing.maxSpots - outing.participantCount;
+  const spotsLeft = outing.maxSpots - participantCount;
+
+  async function handleJoin() {
+    setIsJoining(true);
+    const result = await outingsService.joinOuting(outing.id);
+    setIsJoining(false);
+
+    if (result.isOk) {
+      setParticipantCount(result.data.participantCount);
+      setIsJoined(true);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -222,11 +256,29 @@ function OutingCard({ msg }: { msg: MessageOut }) {
             {spotsLeft} place{spotsLeft > 1 ? "s" : ""} libre{spotsLeft > 1 ? "s" : ""}
           </span>
         </div>
-        <div className="flex items-center justify-between">
+
+        <div className="flex items-center justify-between gap-3">
           <span className="text-xs text-zinc-400">
-            {outing.participantCount}/{outing.maxSpots} participant{outing.participantCount > 1 ? "s" : ""}
+            {participantCount}/{outing.maxSpots} participant{participantCount > 1 ? "s" : ""}
           </span>
-          <span className="text-[10px] text-zinc-400">{formatTime(msg.sentAt)}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-zinc-400">{formatTime(msg.sentAt)}</span>
+            {isMe ? (
+              <span className="text-xs text-zinc-400">Votre sortie</span>
+            ) : isJoined ? (
+              <span className="text-xs font-medium text-[#426200]">Vous participez ✓</span>
+            ) : spotsLeft === 0 ? (
+              <span className="text-xs text-zinc-400">Complet</span>
+            ) : (
+              <button
+                onClick={handleJoin}
+                disabled={isJoining}
+                className="rounded-full bg-[#426200] text-white text-xs font-medium px-4 py-1.5 hover:opacity-90 transition disabled:opacity-50 cursor-pointer"
+              >
+                {isJoining ? "..." : "Participer"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
