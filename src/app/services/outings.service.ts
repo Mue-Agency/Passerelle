@@ -1,4 +1,4 @@
-import type { ProposeOutingDtoOut, JoinOutingDtoOut, GetOutingDtoOut } from "@/backend/usecases_dto/outings";
+import type { ProposeOutingDtoOut, JoinOutingDtoOut, LeaveOutingDtoOut, GetOutingDtoOut } from "@/backend/usecases_dto/outings";
 import { handleResponse } from "./_http";
 
 type ProposeOutingInput = {
@@ -28,5 +28,12 @@ export const outingsService = {
       method: "POST",
     });
     return handleResponse<JoinOutingDtoOut>(res);
+  },
+
+  async leaveOuting(outingId: string) {
+    const res = await fetch(`/api/outings/${outingId}/join`, {
+      method: "DELETE",
+    });
+    return handleResponse<LeaveOutingDtoOut>(res);
   },
 };
