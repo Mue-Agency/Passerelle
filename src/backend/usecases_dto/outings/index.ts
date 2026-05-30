@@ -9,3 +9,7 @@ export type { GetOutingDtoOut } from "./get-outing/get-outing.dto";
 export { joinOuting } from "./join-outing/join-outing.use-case";
 export { JoinOutingDtoIn } from "./join-outing/join-outing.dto";
 export type { JoinOutingDtoOut } from "./join-outing/join-outing.dto";
+
+export { leaveOuting } from "./leave-outing/leave-outing.use-case";
+export { LeaveOutingDtoIn } from "./leave-outing/leave-outing.dto";
+export type { LeaveOutingDtoOut } from "./leave-outing/leave-outing.dto";
