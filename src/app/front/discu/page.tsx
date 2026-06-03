@@ -121,7 +121,7 @@ export default function DiscussionPage() {
         </div>
 
         {/* FIL D'ACTIVITÉ — px-[24px], gap-[24px] */}
-        <div ref={scrollContainerRef} className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto">
+        <div ref={scrollContainerRef} className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto scrollbar-none">
 
           {/* Carte de bienvenue — px-[32px] intérieur, card p-[16px], rounded-[12px] */}
           <div className="px-[32px]">
