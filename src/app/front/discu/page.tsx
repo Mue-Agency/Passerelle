@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { configService } from "@/app/services/config.service";
 import { groupsService } from "@/app/services/groups.service";
@@ -32,14 +32,23 @@ function AuthorName(user: MessageOut["user"]): string {
 export default function DiscussionPage() {
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isAtBottomRef = useRef(true);
+  const prevMessageCountRef = useRef(0);
 
   const [groupId, setGroupId] = useState<string | null>(null);
   const [groupName, setGroupName] = useState<string | null>(null);
   const [myUserId, setMyUserId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sendError, setSendError] = useState("");
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const { messages, isLoading } = useMessages(groupId);
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    setUnreadCount(0);
+  }, []);
 
   useEffect(() => {
     setMyUserId(localStorage.getItem("userId"));
@@ -54,7 +63,32 @@ export default function DiscussionPage() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    function handleScroll() {
+      const el = scrollContainerRef.current;
+      if (!el) return;
+      isAtBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+      if (isAtBottomRef.current) setUnreadCount(0);
+    }
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const newCount = messages.length - prevMessageCountRef.current;
+    if (prevMessageCountRef.current === 0) {
+      messagesEndRef.current?.scrollIntoView();
+    } else if (newCount > 0) {
+      if (isAtBottomRef.current) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      } else {
+        setUnreadCount((prev) => prev + newCount);
+      }
+    }
+    prevMessageCountRef.current = messages.length;
   }, [messages]);
 
   async function handleSendMessage(e: React.FormEvent) {
@@ -66,15 +100,18 @@ export default function DiscussionPage() {
     setNewMessage("");
 
     const result = await messagesService.sendMessage(groupId, content);
-    if (!result.isOk) {
+    if (result.isOk) {
+      isAtBottomRef.current = true;
+      setUnreadCount(0);
+    } else {
       setSendError(result.error);
       setNewMessage(content);
     }
   }
 
   return (
-    <div className="w-full min-h-screen flex justify-center bg-[#FAF9F5] font-sans dark:bg-black">
-      <main className="flex w-full max-w-md min-h-screen flex-col">
+    <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans dark:bg-black overflow-hidden">
+      <main className="flex w-full max-w-md h-full flex-col relative">
 
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
         <div className="w-full flex justify-center items-center h-[52px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
@@ -84,7 +121,7 @@ export default function DiscussionPage() {
         </div>
 
         {/* FIL D'ACTIVITÉ — px-[24px], gap-[24px] */}
-        <div className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto">
+        <div ref={scrollContainerRef} className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto">
 
           {/* Carte de bienvenue — px-[32px] intérieur, card p-[16px], rounded-[12px] */}
           <div className="px-[32px]">
@@ -136,6 +173,19 @@ export default function DiscussionPage() {
 
           <div ref={messagesEndRef} />
         </div>
+
+        {/* BULLE NOUVEAUX MESSAGES */}
+        {unreadCount > 0 && (
+          <button
+            onClick={scrollToBottom}
+            className="absolute bottom-[100px] left-1/2 -translate-x-1/2 z-20 flex items-center gap-[6px] bg-[#426200] text-white text-[13px] font-semibold px-[14px] py-[7px] rounded-full shadow-lg hover:opacity-90 transition cursor-pointer"
+          >
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {unreadCount} nouveau{unreadCount > 1 ? "x" : ""} message{unreadCount > 1 ? "s" : ""}
+          </button>
+        )}
 
         {/* ZONE DE SAISIE — px-[16px], pt-[17px] pb-[16px], border-t */}
         <div className="w-full px-[16px] pt-[17px] pb-[16px] bg-[#FAF9F5] dark:bg-black border-t border-[rgba(193,200,193,0.2)] flex items-center gap-[12px]">
@@ -247,12 +297,19 @@ function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
 
   useEffect(() => {
     if (!msg.outing) return;
-    outingsService.getOuting(msg.outing.id).then((result) => {
-      if (result.isOk) {
-        setParticipantCount(result.data.participantCount);
-        setIsJoined(result.data.isParticipant);
-      }
-    });
+
+    const fetchOuting = () => {
+      outingsService.getOuting(msg.outing!.id).then((result) => {
+        if (result.isOk) {
+          setParticipantCount(result.data.participantCount);
+          setIsJoined(result.data.isParticipant);
+        }
+      });
+    };
+
+    fetchOuting();
+    const interval = setInterval(fetchOuting, 3000);
+    return () => clearInterval(interval);
   }, [msg.outing?.id]);
 
   if (!msg.outing) return null;

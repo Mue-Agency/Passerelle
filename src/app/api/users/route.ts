@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { createProfile, CreateProfileDtoIn } from "@/backend/usecases_dto/users";
 import { createJoinMessage } from "@/backend/usecases_dto/messages";
-import { eventBus } from "@/backend/lib/event-bus";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -20,12 +19,11 @@ export async function POST(req: NextRequest) {
       httpOnly: true,
       sameSite: "lax",
       path:     "/",
-      maxAge:   60 * 60 * 24 * 30,
+      maxAge:   60 * 60,
     });
 
     try {
-      const joinMessage = await createJoinMessage({ userId: result.userId, groupId: result.groupId });
-      eventBus.emit(`group:${result.groupId}`, joinMessage);
+      await createJoinMessage({ userId: result.userId, groupId: result.groupId });
     } catch {}
 
     return Response.json(result, { status: 201 });
