@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { proposeOuting, ProposeOutingDtoIn } from "@/backend/usecases_dto/outings";
-import { eventBus } from "@/backend/lib/event-bus";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params;
@@ -19,7 +18,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ gro
 
   try {
     const message = await proposeOuting(parsed.data);
-    eventBus.emit(`group:${groupId}`, message);
     return Response.json(message, { status: 201 });
   } catch (err) {
     if (err instanceof Error && err.message === "NOT_MEMBER") {

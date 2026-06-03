@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { configService } from "@/app/services/config.service";
 import { groupsService } from "@/app/services/groups.service";
 import { outingsService } from "@/app/services/outings.service";
@@ -23,7 +23,17 @@ function formatSuggestionDate(iso: string): string {
 }
 
 export default function SortiePage() {
+  return (
+    <Suspense>
+      <SortieContent />
+    </Suspense>
+  );
+}
+
+function SortieContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const outingId = searchParams.get("outingId");
 
   const [groupId, setGroupId] = useState<string | null>(null);
   const [groupName, setGroupName] = useState<string | null>(null);
@@ -32,9 +42,11 @@ export default function SortiePage() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
+  const [maxSpots, setMaxSpots] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const isEditMode = !!outingId;
   const suggestionDate = getNextSuggestionDate();
 
   useEffect(() => {
@@ -47,6 +59,19 @@ export default function SortiePage() {
       if (groupResult.isOk) setGroupName(groupResult.data.name);
     });
   }, []);
+
+  useEffect(() => {
+    if (!outingId) return;
+    outingsService.getOuting(outingId).then((result) => {
+      if (!result.isOk) return;
+      setTitle(result.data.title);
+      const d = new Date(result.data.date);
+      setDate(d.toISOString().split("T")[0]);
+      setTime(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+      setLocation(result.data.location);
+      setMaxSpots(result.data.maxSpots);
+    });
+  }, [outingId]);
 
   function applySuggestion() {
     if (!lieu) return;
@@ -66,25 +91,38 @@ export default function SortiePage() {
       return;
     }
 
-    if (!groupId) {
+    if (!isEditMode && !groupId) {
       setError("Impossible de récupérer le groupe.");
       return;
     }
 
     const isoDate = `${date}T${time}:00`;
-
     setIsLoading(true);
-    const result = await outingsService.proposeOuting(groupId, {
-      title: title.trim(),
-      date: isoDate,
-      location: location.trim(),
-      maxSpots: 3,
-    });
-    setIsLoading(false);
 
-    if (!result.isOk) {
-      setError(result.error);
-      return;
+    if (isEditMode) {
+      const result = await outingsService.updateOuting(outingId, {
+        title: title.trim(),
+        date: isoDate,
+        location: location.trim(),
+        maxSpots,
+      });
+      setIsLoading(false);
+      if (!result.isOk) {
+        setError(result.error);
+        return;
+      }
+    } else {
+      const result = await outingsService.proposeOuting(groupId!, {
+        title: title.trim(),
+        date: isoDate,
+        location: location.trim(),
+        maxSpots,
+      });
+      setIsLoading(false);
+      if (!result.isOk) {
+        setError(result.error);
+        return;
+      }
     }
 
     router.push("/front/discu");
@@ -118,11 +156,11 @@ export default function SortiePage() {
 
           {/* TITRE */}
           <h2 className="text-xl font-bold text-[#001A0E] dark:text-zinc-50 mt-4 mb-6">
-            Proposer une sortie
+            {isEditMode ? "Modifier la sortie" : "Proposer une sortie"}
           </h2>
 
-          {/* SECTION SUGGESTION */}
-          {lieu && (
+          {/* SECTION SUGGESTION (seulement en mode création) */}
+          {!isEditMode && lieu && (
             <div className="flex flex-col gap-3 mb-8">
               <p className="text-base font-bold text-[#001A0E] dark:text-zinc-200">
                 Suggestion
@@ -247,7 +285,7 @@ export default function SortiePage() {
           <button
             type="submit"
             form="sortie-form"
-            disabled={isLoading || !groupId || !title.trim() || !date || !time || !location.trim()}
+            disabled={isLoading || (!isEditMode && !groupId) || !title.trim() || !date || !time || !location.trim()}
             className="w-14 h-14 rounded-full bg-[#425C02] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isLoading ? (

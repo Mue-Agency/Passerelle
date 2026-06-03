@@ -1,33 +1,45 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { MessageOut } from "@/backend/usecases_dto/messages";
 import { messagesService } from "@/app/services/messages.service";
+
+const POLL_INTERVAL = 3000;
 
 export function useMessages(groupId: string | null) {
   const [messages, setMessages] = useState<MessageOut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const latestIdRef = useRef<string | null>(null);
+
+  const fetchMessages = useCallback(async (gId: string) => {
+    const result = await messagesService.getMessages(gId);
+    if (result.isOk) {
+      setMessages(result.data);
+      if (result.data.length > 0) {
+        latestIdRef.current = result.data[result.data.length - 1].id;
+      }
+    }
+    return result;
+  }, []);
 
   useEffect(() => {
     if (!groupId) return;
 
-    messagesService.getMessages(groupId).then((result) => {
-      if (result.isOk) setMessages(result.data);
-      setIsLoading(false);
+    let active = true;
+
+    fetchMessages(groupId).then(() => {
+      if (active) setIsLoading(false);
     });
 
-    const source = new EventSource(`/api/groups/${groupId}/messages/stream`);
+    const interval = setInterval(() => {
+      if (active) fetchMessages(groupId);
+    }, POLL_INTERVAL);
 
-    source.onmessage = (e: MessageEvent) => {
-      const message = JSON.parse(e.data as string) as MessageOut;
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === message.id)) return prev;
-        return [...prev, message];
-      });
+    return () => {
+      active = false;
+      clearInterval(interval);
     };
-
-    return () => source.close();
-  }, [groupId]);
+  }, [groupId, fetchMessages]);
 
   return { messages, isLoading };
 }
