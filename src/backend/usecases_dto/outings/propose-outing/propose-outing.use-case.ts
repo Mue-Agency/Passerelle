@@ -49,6 +49,7 @@ export async function proposeOuting(dto: ProposeOutingDtoIn): Promise<ProposeOut
       location:         outing.location,
       maxSpots:         outing.maxSpots,
       participantCount: 0,
+      isParticipant:    false,
     },
   };
 }

@@ -17,6 +17,7 @@ export const MessageOut = z.object({
     location:         z.string(),
     maxSpots:         z.number(),
     participantCount: z.number(),
+    isParticipant:    z.boolean(),
   }).nullable(),
 });
 

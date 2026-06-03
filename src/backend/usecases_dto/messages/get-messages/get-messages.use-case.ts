@@ -13,7 +13,10 @@ export async function getMessages(dto: GetMessagesDtoIn): Promise<GetMessagesDto
     include: {
       user: { select: { id: true, firstName: true, lastName: true } },
       outing: {
-        include: { _count: { select: { participants: true } } },
+        include: {
+          _count: { select: { participants: true } },
+          participants: { select: { userId: true } },
+        },
       },
     },
   });
@@ -32,6 +35,7 @@ export async function getMessages(dto: GetMessagesDtoIn): Promise<GetMessagesDto
           location:         msg.outing.location,
           maxSpots:         msg.outing.maxSpots,
           participantCount: msg.outing._count.participants,
+          isParticipant:    msg.outing.participants.some((p) => p.userId === dto.userId),
         }
       : null,
   }));

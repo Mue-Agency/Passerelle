@@ -291,49 +291,22 @@ function SpotsIndicator({ participantCount, maxSpots, isMe }: { participantCount
 
 function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
   const router = useRouter();
-  const [participantCount, setParticipantCount] = useState(msg.outing?.participantCount ?? 0);
-  const [isJoined, setIsJoined] = useState(false);
   const [isActing, setIsActing] = useState(false);
-
-  useEffect(() => {
-    if (!msg.outing) return;
-
-    const fetchOuting = () => {
-      outingsService.getOuting(msg.outing!.id).then((result) => {
-        if (result.isOk) {
-          setParticipantCount(result.data.participantCount);
-          setIsJoined(result.data.isParticipant);
-        }
-      });
-    };
-
-    fetchOuting();
-    const interval = setInterval(fetchOuting, 3000);
-    return () => clearInterval(interval);
-  }, [msg.outing?.id]);
 
   if (!msg.outing) return null;
   const { outing } = msg;
-  const spotsLeft = outing.maxSpots - participantCount;
+  const spotsLeft = outing.maxSpots - outing.participantCount;
 
   async function handleJoin() {
     setIsActing(true);
-    const result = await outingsService.joinOuting(outing.id);
+    await outingsService.joinOuting(outing.id);
     setIsActing(false);
-    if (result.isOk) {
-      setParticipantCount(result.data.participantCount);
-      setIsJoined(true);
-    }
   }
 
   async function handleLeave() {
     setIsActing(true);
-    const result = await outingsService.leaveOuting(outing.id);
+    await outingsService.leaveOuting(outing.id);
     setIsActing(false);
-    if (result.isOk) {
-      setParticipantCount(result.data.participantCount);
-      setIsJoined(false);
-    }
   }
 
   return (
@@ -360,9 +333,9 @@ function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
           </div>
           <div className="flex flex-col gap-[4px]">
             <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843] dark:text-zinc-400"}`}>
-              Places : {participantCount}/{outing.maxSpots}
+              Places : {outing.participantCount}/{outing.maxSpots}
             </p>
-            <SpotsIndicator participantCount={participantCount} maxSpots={outing.maxSpots} isMe={isMe} />
+            <SpotsIndicator participantCount={outing.participantCount} maxSpots={outing.maxSpots} isMe={isMe} />
           </div>
         </div>
 
@@ -374,7 +347,7 @@ function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
           >
             Modifier
           </button>
-        ) : isJoined ? (
+        ) : outing.isParticipant ? (
           <button
             onClick={handleLeave}
             disabled={isActing}
