@@ -14,7 +14,7 @@ import { outingsRouter } from "./routes/outings";
 const app = express();
 const httpServer = createServer(app);
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/+$/, "");
 
 const io = new Server(httpServer, {
   cors: {
