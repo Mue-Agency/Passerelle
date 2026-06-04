@@ -7,7 +7,7 @@ import { groupsService } from "@/app/services/groups.service";
 import { messagesService } from "@/app/services/messages.service";
 import { useMessages } from "@/app/hooks/useMessages";
 import { outingsService } from "@/app/services/outings.service";
-import type { MessageOut } from "@/backend/usecases_dto/messages";
+import type { MessageOut } from "@/app/hooks/useMessages";
 
 function formatTime(sentAt: Date | string): string {
   return new Date(sentAt as string).toLocaleTimeString("fr-FR", {

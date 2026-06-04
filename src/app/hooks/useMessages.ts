@@ -1,43 +1,64 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import type { MessageOut } from "@/backend/usecases_dto/messages";
+import { useState, useEffect, useCallback } from "react";
 import { messagesService } from "@/app/services/messages.service";
+import type { MessageOut } from "@/app/services/messages.service";
+import { getSocket } from "@/app/lib/socket";
 
-const POLL_INTERVAL = 3000;
+export type { MessageOut };
 
 export function useMessages(groupId: string | null) {
   const [messages, setMessages] = useState<MessageOut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const latestIdRef = useRef<string | null>(null);
 
   const fetchMessages = useCallback(async (gId: string) => {
     const result = await messagesService.getMessages(gId);
-    if (result.isOk) {
-      setMessages(result.data);
-      if (result.data.length > 0) {
-        latestIdRef.current = result.data[result.data.length - 1].id;
-      }
-    }
+    if (result.isOk) setMessages(result.data);
     return result;
   }, []);
 
   useEffect(() => {
     if (!groupId) return;
 
-    let active = true;
+    fetchMessages(groupId).then(() => setIsLoading(false));
 
-    fetchMessages(groupId).then(() => {
-      if (active) setIsLoading(false);
-    });
+    const socket = getSocket();
+    if (!socket.connected) socket.connect();
+    socket.emit("join-group", groupId);
 
-    const interval = setInterval(() => {
-      if (active) fetchMessages(groupId);
-    }, POLL_INTERVAL);
+    const handleNewMessage = (message: MessageOut) => {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) return prev;
+        return [...prev, message];
+      });
+    };
+
+    const handleOutingUpdated = (updated: {
+      id: string;
+      title: string;
+      date: string;
+      location: string;
+      maxSpots: number;
+      participantCount: number;
+    }) => {
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.outing?.id !== updated.id) return msg;
+          return {
+            ...msg,
+            outing: { ...msg.outing, ...updated },
+          };
+        }),
+      );
+    };
+
+    socket.on("new-message", handleNewMessage);
+    socket.on("outing-updated", handleOutingUpdated);
 
     return () => {
-      active = false;
-      clearInterval(interval);
+      socket.off("new-message", handleNewMessage);
+      socket.off("outing-updated", handleOutingUpdated);
+      socket.emit("leave-group", groupId);
     };
   }, [groupId, fetchMessages]);
 

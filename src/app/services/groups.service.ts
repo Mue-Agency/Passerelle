@@ -1,9 +1,12 @@
-import type { GetGroupDtoOut } from "@/backend/usecases_dto/groups";
-import { handleResponse } from "./_http";
+import { apiUrl, authHeaders, handleResponse } from "./_http";
+
+type GroupOut = { id: string; name: string };
 
 export const groupsService = {
   async getGroup(groupId: string) {
-    const res = await fetch(`/api/groups/${groupId}`);
-    return handleResponse<GetGroupDtoOut>(res);
+    const res = await fetch(apiUrl(`/api/groups/${groupId}`), {
+      headers: authHeaders(),
+    });
+    return handleResponse<GroupOut>(res);
   },
 };
