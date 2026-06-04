@@ -40,6 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# server
+/server/node_modules
+/server/dist
+
 # prisma (generated via prisma generate at build time)
 /src/generated/prisma
 

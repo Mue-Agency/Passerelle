@@ -48,6 +48,8 @@ export default function FrontPage() {
     }
 
     localStorage.setItem("userId", result.data.userId);
+    localStorage.setItem("token", result.data.token);
+    document.cookie = `userId=${result.data.userId}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
     router.push("/front/discu");
   }
 
@@ -119,6 +121,7 @@ export default function FrontPage() {
             type="submit"
             form="profile-form"
             disabled={isLoading || !groupId}
+            suppressHydrationWarning
             className="w-full rounded-lg border border-transparent bg-[#426200] dark:bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white cursor-pointer hover:opacity-90 outline-none focus:ring-2 focus:ring-black transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Chargement..." : "Continuer"}

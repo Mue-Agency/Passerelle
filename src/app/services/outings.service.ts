@@ -1,5 +1,4 @@
-import type { ProposeOutingDtoOut, JoinOutingDtoOut, LeaveOutingDtoOut, GetOutingDtoOut, UpdateOutingDtoOut } from "@/backend/usecases_dto/outings";
-import { handleResponse } from "./_http";
+import { apiUrl, authHeaders, handleResponse } from "./_http";
 
 type ProposeOutingInput = {
   title: string;
@@ -8,41 +7,58 @@ type ProposeOutingInput = {
   maxSpots: number;
 };
 
+type OutingOut = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  maxSpots: number;
+  participantCount: number;
+  spotsLeft: number;
+  isParticipant: boolean;
+  createdBy: { id: string; firstName: string; lastName: string };
+  participants: { id: string; firstName: string; lastName: string }[];
+};
+
 export const outingsService = {
   async proposeOuting(groupId: string, input: ProposeOutingInput) {
-    const res = await fetch(`/api/groups/${groupId}/outings`, {
+    const res = await fetch(apiUrl(`/api/outings/${groupId}/propose`), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify(input),
     });
-    return handleResponse<ProposeOutingDtoOut>(res);
+    return handleResponse<Record<string, unknown>>(res);
   },
 
   async getOuting(outingId: string) {
-    const res = await fetch(`/api/outings/${outingId}`);
-    return handleResponse<GetOutingDtoOut>(res);
+    const res = await fetch(apiUrl(`/api/outings/${outingId}`), {
+      headers: authHeaders(),
+    });
+    return handleResponse<OutingOut>(res);
   },
 
   async joinOuting(outingId: string) {
-    const res = await fetch(`/api/outings/${outingId}/join`, {
+    const res = await fetch(apiUrl(`/api/outings/${outingId}/join`), {
       method: "POST",
+      headers: authHeaders(),
     });
-    return handleResponse<JoinOutingDtoOut>(res);
+    return handleResponse<{ participantCount: number }>(res);
   },
 
   async leaveOuting(outingId: string) {
-    const res = await fetch(`/api/outings/${outingId}/join`, {
+    const res = await fetch(apiUrl(`/api/outings/${outingId}/join`), {
       method: "DELETE",
+      headers: authHeaders(),
     });
-    return handleResponse<LeaveOutingDtoOut>(res);
+    return handleResponse<{ participantCount: number }>(res);
   },
 
   async updateOuting(outingId: string, input: ProposeOutingInput) {
-    const res = await fetch(`/api/outings/${outingId}`, {
+    const res = await fetch(apiUrl(`/api/outings/${outingId}`), {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: authHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify(input),
     });
-    return handleResponse<UpdateOutingDtoOut>(res);
+    return handleResponse<Record<string, unknown>>(res);
   },
 };
