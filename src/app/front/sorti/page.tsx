@@ -422,58 +422,65 @@ function SortieContent() {
         </form>
 
         {/* BOUTON ENVOYER (rond, en bas à droite) */}
-        <div className="absolute bottom-6 right-6">
-          <button
-            type="submit"
-            form="sortie-form"
-            disabled={isLoading || (!isEditMode && !groupId) || !title.trim() || !date || !time || !location.trim()}
-            className="w-14 h-14 rounded-full bg-[#425C02] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <span className="text-xs">...</span>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[1px] -translate-y-[0.5px]">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            )}
-          </button>
-        </div>
+<div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+  <button
+    type="submit"
+    form="sortie-form"
+    disabled={
+      isLoading ||
+      (!isEditMode && !groupId) ||
+      !title.trim() ||
+      !date ||
+      !time ||
+      !location.trim()
+    }
+    className="h-14 px-6 rounded-full bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold"
+  >
+    {isLoading ? "..." : "Créer un évènement"}
+  </button>
+</div>
 
         {showModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="w-[90%] max-w-sm rounded-2xl bg-white dark:bg-zinc-900 p-6 text-center shadow-xl">
 
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <path
-                    d="M20 6L9 17l-5-5"
-                    stroke="#16a34a"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#C7D7F3]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 40 40" fill="none" >
+                  <path d="M17.2 29.2L31.3 15.1L28.5 12.3L17.2 23.6L11.5 17.9L8.7 20.7L17.2 29.2ZM20 40C17.2333 40 14.6333 39.475 12.2 38.425C9.76667 37.375 7.65 35.95 5.85 34.15C4.05 32.35 2.625 30.2333 1.575 27.8C0.525 25.3667 0 22.7667 0 20C0 17.2333 0.525 14.6333 1.575 12.2C2.625 9.76667 4.05 7.65 5.85 5.85C7.65 4.05 9.76667 2.625 12.2 1.575C14.6333 0.525 17.2333 0 20 0C22.7667 0 25.3667 0.525 27.8 1.575C30.2333 2.625 32.35 4.05 34.15 5.85C35.95 7.65 37.375 9.76667 38.425 12.2C39.475 14.6333 40 17.2333 40 20C40 22.7667 39.475 25.3667 38.425 27.8C37.375 30.2333 35.95 32.35 34.15 34.15C32.35 35.95 30.2333 37.375 27.8 38.425C25.3667 39.475 22.7667 40 20 40Z" fill="#152646" />
                 </svg>
               </div>
+              
 
               <h2 className="text-lg font-semibold text-[#001A0E] dark:text-zinc-100">
                 {isEditMode ? "Sortie modifiée !" : "Évènement créé !"}
               </h2>
 
               <p className="mt-2 text-sm text-zinc-500">
-                {isEditMode ? "Votre sortie a bien été mise à jour." : "Votre sortie a bien été publiée dans le groupe."}
+                {isEditMode ? "Votre sortie a été modifiée avec succès. Préparez-vous pour un moment convivial !." : "Votre sortie a été créée avec succès. Préparez-vous pour un moment convivial !."}
               </p>
+
+              <div className="flex items-center gap-3 rounded-2xl border border-[#D8E2F2] bg-[#EEF3FB] px-4 py-3 top-4 mt-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C7D7F3] flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none">
+                    <path d="M7.95 16.35L4.4 12.8L5.85 11.35L7.95 13.45L12.15 9.25L13.6 10.7L7.95 16.35ZM2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V4C0 3.45 0.195833 2.97917 0.5875 2.5875C0.979167 2.19583 1.45 2 2 2H3V0H5V2H13V0H15V2H16C16.55 2 17.0208 2.19583 17.4125 2.5875C17.8042 2.97917 18 3.45 18 4V18C18 18.55 17.8042 19.0208 17.4125 19.4125C17.0208 19.8042 16.55 20 16 20H2ZM2 18H16V8H2V18ZM2 6H16V4H2V6ZM2 6V4V6Z" fill="#3B4B39"/>
+                  </svg>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <p className="truncate text-sm font-semibold text-[#001A0E]">
+                    Confirmation d'activité
+                  </p>
+                  <p className="text-xs text-zinc-500">
+                    Vous êtes inscrit à la sortie
+                  </p>
+                </div>
+              </div>
 
               <button
                 onClick={() => router.push("/front/discu")}
                 className="mt-6 w-full rounded-lg bg-[#152646] px-4 py-3 text-sm font-medium text-white hover:opacity-90 transition cursor-pointer"
               >
-                Retour à la discussion
+                Retour au Chat 
               </button>
             </div>
           </div>

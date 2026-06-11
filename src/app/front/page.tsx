@@ -9,6 +9,7 @@ export default function FrontPage() {
   const router = useRouter();
   const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
+  const [mdp, setMdp] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [groupId, setGroupId] = useState<string | null>(null);
@@ -105,6 +106,20 @@ export default function FrontPage() {
                 type="text"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
+                placeholder="ex. Dupont"
+                className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm text-black dark:text-zinc-50 outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-400 transition"
+              />
+            </div>
+
+             <div className="flex flex-col gap-1.5">
+              <label htmlFor="mdp" className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                Mot de passe 
+              </label>
+              <input
+                id="mdp"
+                type="password"
+                value={mdp}
+                onChange={(e) => setMdp(e.target.value)}
                 placeholder="ex. Dupont"
                 className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2.5 text-sm text-black dark:text-zinc-50 outline-none focus:ring-2 focus:ring-black dark:focus:ring-zinc-400 transition"
               />
