@@ -167,9 +167,9 @@ function SortieContent() {
                 Suggestion
               </p>
               <div className="flex items-center gap-4 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl p-4 shadow-xs">
-                <div className="w-16 h-16 rounded-2xl bg-[#E8F0D0] flex items-center justify-center flex-shrink-0">
-                  <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3" stroke="#426200" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <div className="w-16 h-16 rounded-2xl bg-[#C7D7F3] flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 23 23" fill="none">
+                    <path d="M0 22.5V20H20V22.5H0ZM5 17.5C3.625 17.5 2.44792 17.0104 1.46875 16.0312C0.489583 15.0521 0 13.875 0 12.5V0H20C20.6875 0 21.276 0.244792 21.7656 0.734375C22.2552 1.22396 22.5 1.8125 22.5 2.5V6.25C22.5 6.9375 22.2552 7.52604 21.7656 8.01562C21.276 8.50521 20.6875 8.75 20 8.75H17.5V12.5C17.5 13.875 17.0104 15.0521 16.0312 16.0312C15.0521 17.0104 13.875 17.5 12.5 17.5H5ZM5 15H12.5C13.1875 15 13.776 14.7552 14.2656 14.2656C14.7552 13.776 15 13.1875 15 12.5V2.5H2.5V12.5C2.5 13.1875 2.74479 13.776 3.23438 14.2656C3.72396 14.7552 4.3125 15 5 15ZM17.5 6.25H20V2.5H17.5V6.25Z" fill="#152646"/>
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -188,7 +188,7 @@ function SortieContent() {
                 <button
                   type="button"
                   onClick={applySuggestion}
-                  className="w-10 h-10 rounded-full bg-[#426200] text-white flex items-center justify-center flex-shrink-0 hover:opacity-90 transition cursor-pointer"
+                  className="w-10 h-10 rounded-full bg-[#152646] text-white flex items-center justify-center flex-shrink-0 hover:opacity-90 transition cursor-pointer"
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M7 0v14M0 7h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -258,7 +258,7 @@ function SortieContent() {
             </div>
 
             {/* Lieu */}
-            <div className="flex flex-col gap-2">
+            {/* <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-[#001A0E] dark:text-zinc-200 pl-1">
                 Lieu
               </label>
@@ -275,7 +275,7 @@ function SortieContent() {
                   className="w-full bg-transparent outline-none text-sm text-[#001A0E] dark:text-zinc-100 placeholder-zinc-400"
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Sondage Horaires */}
             <div className="rounded-[28px] bg-[#EEF2F8] p-6">
@@ -348,17 +348,57 @@ function SortieContent() {
               </button>
             </div>
 
-            {/* Lieu de rendez-vous */}
-            <div className="flex flex-col gap-3">
-              <p className="text-base font-bold text-[#001A0E] dark:text-zinc-200">
-                Lieu de rendez-vous
+        {/* Lieu de rendez-vous */}
+        <div className="flex items-center justify-between">
+          <p className="text-base font-bold text-[#001A0E] dark:text-zinc-200">
+            Lieu de rendez-vous
+          </p>
+
+          <button
+            type="button"
+            className="text-sm font-semibold text-[#152646] hover:opacity-70 transition"
+          >
+            Changer
+          </button>
+        </div>
+
+        <div className="relative overflow-hidden rounded-3xl">
+          {/* Image */}
+          <img
+            src="/LIEURDV.png"
+            alt="Lieu"
+            className="w-full h-48 object-cover rounded-xl border border-zinc-200/50 dark:border-zinc-800"
+          />
+
+          {/* Carte adresse */}
+          <div className="absolute bottom-3 left-3">
+            <div className="flex items-center gap-2 rounded-xl bg-white/95 px-1 py-1 shadow-lg backdrop-blur">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EEF2F8] flex-shrink-0">
+                <svg
+                  width="14"
+                  height="18"
+                  viewBox="0 0 16 20"
+                  fill="none"
+                >
+                  <path
+                    d="M8 10a2 2 0 100-4 2 2 0 000 4z"
+                    stroke="#152646"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 19s6-4.5 6-11A6 6 0 002 8c0 6.5 6 11 6 11z"
+                    stroke="#152646"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </div>
+
+              <p className="truncate text-xs font-medium text-[#001A0E]">
+                {location || "Aucune adresse sélectionnée"}
               </p>
-              <img
-                src="/LIEURDV.png"
-                alt="Carte du lieu de rendez-vous"
-                className="w-full h-48 object-cover rounded-xl border border-zinc-200/50 dark:border-zinc-800"
-              />
             </div>
+          </div>
+        </div>
 
             {/* Sortie récurrente */}
             <div className="rounded-[28px] bg-[#EEF2F8] p-6">

@@ -110,7 +110,8 @@ export default function DiscussionPage() {
   }
 
   return (
-    <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans dark:bg-black overflow-hidden">
+    // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans dark:bg-black overflow-hidden">
+      <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5] dark:bg-black">
       <main className="flex w-full max-w-md h-full flex-col relative">
 
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
@@ -125,14 +126,14 @@ export default function DiscussionPage() {
 
           {/* Carte de bienvenue — px-[32px] intérieur, card p-[16px], rounded-[12px] */}
           <div className="px-[32px]">
-            <div className="flex flex-col gap-[24px] items-start p-[16px] bg-white dark:bg-zinc-900 rounded-[12px] w-full">
+            <div className="flex flex-col gap-[24px] items-start p-[16px] bg-[#E3EBF9] dark:bg-zinc-900 rounded-[12px] w-full">
               <div className="w-full flex flex-col gap-[16px] text-center text-[#001A0E] dark:text-zinc-50">
                 <h2 className="text-[18px] font-bold leading-normal">
                   Bienvenue dans le groupe !
                 </h2>
                 <p className="text-[14px] leading-normal text-[#001A0E] dark:text-zinc-400">
                   Ce groupe réunit des personnes que vous avez peut-être déjà croisées ici.
-                </p>
+                </p> 
               </div>
               <div className="w-full flex flex-col gap-[16px] items-start">
                 <p className="text-[16px] font-semibold text-[#001A0E] dark:text-zinc-300 text-center w-full leading-normal">
@@ -140,7 +141,7 @@ export default function DiscussionPage() {
                 </p>
                 <button
                   onClick={() => router.push("/front/sorti")}
-                  className="w-full flex items-center justify-center gap-[12px] border-2 border-[#426200] rounded-[8px] px-[24px] py-[8px] text-[16px] font-semibold text-[#426200] hover:bg-[#426200]/5 transition cursor-pointer"
+                  className="w-full flex items-center justify-center gap-[12px] border-2 border-[#152646] rounded-[8px] px-[24px] py-[8px] text-[16px] font-semibold text-[#152646] hover:bg-[#152646]/5 transition cursor-pointer bg-white "
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20" fill="none">
                     <path fillRule="evenodd" clipRule="evenodd" d="M14 17V20H16V17H19V15H16V12H14V15H11V17H14ZM0.5875 17.4125C0.979167 17.8042 1.45 18 2 18H9V16H2V8H14V10.025H16V4C16 3.45 15.8042 2.97917 15.4125 2.5875C15.0208 2.19583 14.55 2 14 2H13V0H11V2H5V0H3V2H2C1.45 2 0.979167 2.19583 0.5875 2.5875C0.195833 2.97917 0 3.45 0 4V16C0 16.55 0.195833 17.0208 0.5875 17.4125ZM14 6H2V4H14V6Z" fill="currentColor" />
@@ -194,16 +195,11 @@ export default function DiscussionPage() {
             onClick={() => router.push("/front/sorti")}
             className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] dark:text-zinc-300 hover:opacity-70 transition cursor-pointer flex-shrink-0"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-              <line x1="12" y1="14" x2="12" y2="20" />
-              <line x1="9" y1="17" x2="15" y2="17" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20" fill="none">
+              <path fillRule="evenodd" clip-rule="evenodd" d="M14 17V20H16V17H19V15H16V12H14V15H11V17H14ZM0.5875 17.4125C0.979167 17.8042 1.45 18 2 18H9V16H2V8H14V10.025H16V4C16 3.45 15.8042 2.97917 15.4125 2.5875C15.0208 2.19583 14.55 2 14 2H13V0H11V2H5V0H3V2H2C1.45 2 0.979167 2.19583 0.5875 2.5875C0.195833 2.97917 0 3.45 0 4V16C0 16.55 0.195833 17.0208 0.5875 17.4125ZM14 6H2V4H14V6Z" fill="#152646"/>
             </svg>
           </button>
-
+ 
           <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-[12px]">
             <div className="bg-[#EFEEEA] dark:bg-zinc-900 rounded-full px-[24px] py-[16px] flex-1">
               <input
@@ -217,7 +213,7 @@ export default function DiscussionPage() {
             <button
               type="submit"
               disabled={!newMessage.trim() || !groupId}
-              className="w-[52px] h-[52px] rounded-full bg-[#426200] text-white hover:opacity-90 transition flex items-center justify-center flex-shrink-0 cursor-pointer disabled:opacity-50"
+              className="w-[52px] h-[52px] rounded-full bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center flex-shrink-0 cursor-pointer disabled:opacity-50"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="19" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[2px]">
                 <line x1="22" y1="2" x2="11" y2="13" />
@@ -256,8 +252,8 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       )}
       <div className={`max-w-[286px] rounded-[12px] p-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex gap-[8px] items-end ${
         isMe
-          ? "bg-[#426200] text-white rounded-tl-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tr-none"
-          : "bg-white dark:bg-zinc-900 text-[#1B1C1A] dark:text-zinc-50 rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
+          ? "bg-[#152546] text-white rounded-tl-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tr-none"
+          : "bg-white dark:bg-zinc-900 text-[#E3EBF9] dark:text-zinc-50 rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
       }`}>
         <p className="break-words leading-normal text-[16px] flex-1 min-w-0">{msg.content}</p>
         <span className={`text-[12px] leading-[18px] whitespace-nowrap flex-shrink-0 ${isMe ? "text-white/70" : "text-[#727973]"}`}>
@@ -363,7 +359,7 @@ function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
           <button
             onClick={handleJoin}
             disabled={isActing}
-            className="w-full rounded-[8px] bg-[#426200] text-white text-[16px] font-semibold py-[8px] px-[24px] hover:opacity-90 transition disabled:opacity-50 cursor-pointer text-center"
+            className="w-full rounded-[8px] bg-[#152646] text-white text-[16px] font-semibold py-[8px] px-[24px] hover:opacity-90 transition disabled:opacity-50 cursor-pointer text-center"
           >
             {isActing ? "..." : "Continuer"}
           </button>

@@ -4,6 +4,38 @@ import { requireAuth } from "../lib/authMiddleware";
 
 export const groupsRouter = Router();
 
+groupsRouter.get("/:groupId/members", async (req, res) => {
+  const groupId = req.params.groupId as string;
+
+  try {
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+      select: {
+        members: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!group) {
+      res.status(404).json({ error: "Groupe introuvable." });
+      return;
+    }
+
+    res.json({ members: group.members.map((member) => member.user) });
+  } catch {
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 groupsRouter.get("/:groupId", async (req, res) => {
   const groupId = req.params.groupId as string;
 
