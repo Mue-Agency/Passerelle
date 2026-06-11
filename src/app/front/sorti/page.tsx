@@ -45,6 +45,7 @@ function SortieContent() {
   const [maxSpots, setMaxSpots] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const isEditMode = !!outingId;
   const suggestionDate = getNextSuggestionDate();
@@ -125,7 +126,7 @@ function SortieContent() {
       }
     }
 
-    router.push("/front/discu");
+    setShowModal(true);
   }
 
   const truncatedName = groupName
@@ -275,6 +276,106 @@ function SortieContent() {
                 />
               </div>
             </div>
+
+            {/* Sondage Horaires */}
+            <div className="rounded-[28px] bg-[#EEF2F8] p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 18 18"
+                    fill="none"
+                  >
+                    <path
+                      d="M4 14H6V7H4V14ZM8 14H10V4H8V14ZM12 14H14V10H12V14ZM2 18C1.45 18 0.979167 17.8042 0.5875 17.4125C0.195833 17.0208 0 16.55 0 16V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H16C16.55 0 17.0208 0.195833 17.4125 0.5875C17.8042 0.979167 18 1.45 18 2V16C18 16.55 17.8042 17.0208 17.4125 17.4125C17.0208 17.8042 16.55 18 16 18H2Z"
+                      fill="#152646"
+                    />
+                  </svg>
+
+                  <h3 className="text-sm font-semibold text-[#1B1B1B]">
+                    Lancer un sondage
+                    <br />
+                    (Horaires)
+                  </h3>
+                </div>
+
+                {/* <Switch
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      // 👉 envoi direct dans la discussion
+                      sendToDiscussion({
+                        type: "poll",
+                        label: "Horaires",
+                      });
+                    }
+                  }}
+                /> */}
+              </div>
+
+              {/* Date (toujours affichée, plus de condition) */}
+              <button
+                type="button"
+                className="mt-8 flex w-full items-center justify-between rounded-2xl bg-white px-6 py-5"
+                // onClick={() => {
+                //   sendToDiscussion({
+                //     type: "poll_date",
+                //     value: "Mardi 14 Mai - 10:00",
+                //   });
+                // }}
+              >
+                <span className="text-sm font-medium text-[#2A2A2A]">
+                  Mardi 14 Mai - 10:00
+                </span>
+
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <rect
+                    x="3"
+                    y="5"
+                    width="18"
+                    height="16"
+                    rx="2"
+                    stroke="#6B6B6B"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M8 3V7M16 3V7M3 9H21"
+                    stroke="#6B6B6B"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Lieu de rendez-vous */}
+            <div className="flex flex-col gap-3">
+              <p className="text-base font-bold text-[#001A0E] dark:text-zinc-200">
+                Lieu de rendez-vous
+              </p>
+              <img
+                src="/LIEURDV.png"
+                alt="Carte du lieu de rendez-vous"
+                className="w-full h-48 object-cover rounded-xl border border-zinc-200/50 dark:border-zinc-800"
+              />
+            </div>
+
+            {/* Sortie récurrente */}
+            <div className="rounded-[28px] bg-[#EEF2F8] p-6">
+              <div className="flex items-center gap-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none">
+                  <path d="M4 20L0 16L4 12L5.4 13.45L3.85 15H14V11H16V17H3.85L5.4 18.55L4 20ZM2 9V3H14.15L12.6 1.45L14 0L18 4L14 8L12.6 6.55L14.15 5H4V9H2Z" fill="#152646" />
+                </svg>
+                <label className="text-sm font-semibold text-[#001A0E] dark:text-zinc-200">
+                  Rendre cette sortie récurrente
+                </label>
+
+                {/* <Switch
+                  checked={enabled}
+                  onCheckedChange={setEnabled}
+                /> */}
+              </div>
+            </div>
           </div>
 
           {error && <p className="text-sm text-red-500 text-center mt-4">{error}</p>}
@@ -298,6 +399,45 @@ function SortieContent() {
             )}
           </button>
         </div>
+
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="w-[90%] max-w-sm rounded-2xl bg-white dark:bg-zinc-900 p-6 text-center shadow-xl">
+
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M20 6L9 17l-5-5"
+                    stroke="#16a34a"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+
+              <h2 className="text-lg font-semibold text-[#001A0E] dark:text-zinc-100">
+                {isEditMode ? "Sortie modifiée !" : "Évènement créé !"}
+              </h2>
+
+              <p className="mt-2 text-sm text-zinc-500">
+                {isEditMode ? "Votre sortie a bien été mise à jour." : "Votre sortie a bien été publiée dans le groupe."}
+              </p>
+
+              <button
+                onClick={() => router.push("/front/discu")}
+                className="mt-6 w-full rounded-lg bg-[#152646] px-4 py-3 text-sm font-medium text-white hover:opacity-90 transition cursor-pointer"
+              >
+                Retour à la discussion
+              </button>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>
