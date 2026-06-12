@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
@@ -6,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { verifyToken } from "./lib/auth";
 import { prisma } from "./lib/prisma";
 import { configRouter } from "./routes/config";
+import { authRouter } from "./routes/auth";
 import { usersRouter } from "./routes/users";
 import { groupsRouter } from "./routes/groups";
 import { messagesRouter } from "./routes/messages";
@@ -15,20 +17,23 @@ const app = express();
 const httpServer = createServer(app);
 
 const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/+$/, "");
+const DASH_URL = (process.env.DASH_URL || "http://localhost:3001").replace(/\/+$/, "");
+const allowedOrigins = [FRONTEND_URL, DASH_URL];
 
 const io = new Server(httpServer, {
   cors: {
-    origin: FRONTEND_URL,
+    origin: allowedOrigins,
     credentials: true,
   },
 });
 
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
 
 app.set("io", io);
 
@@ -37,6 +42,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use("/api/config", configRouter);
+app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/groups", groupsRouter);
 app.use("/api/messages", messagesRouter);

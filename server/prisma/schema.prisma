@@ -7,22 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  CITOYEN
+  ADMIN
+}
+
 model User {
-  id        String   @id @default(cuid())
-  firstName String
-  lastName  String
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(CITOYEN)
+  firstName    String
+  lastName     String
+  avatarUrl    String?
+  interests    String[] @default([])
+  createdAt    DateTime @default(now())
 
   memberships    GroupMember[]
   messages       Message[]
   outings        Outing[]
   participations OutingParticipant[]
+  pollVotes      OutingPollVote[]
 }
 
 model Group {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  name          String
+  lieu          String
+  maxMembers    Int      @default(4)
+  sessionNumber Int      @default(1)
+  baseGroupId   String?
+  createdAt     DateTime @default(now())
+
+  baseGroup Group?  @relation("GroupSessions", fields: [baseGroupId], references: [id])
+  sessions  Group[] @relation("GroupSessions")
 
   members  GroupMember[]
   messages Message[]
@@ -61,30 +79,59 @@ enum MessageType {
   JOIN
 }
 
+enum ParticipationStatus {
+  ACCEPTED
+  REFUSED
+}
+
 model Outing {
-  id        String   @id @default(cuid())
-  title     String
-  date      DateTime
-  location  String
-  maxSpots  Int      @default(3)
-  groupId   String
-  userId    String
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  title        String
+  date         DateTime
+  location     String
+  maxSpots     Int      @default(3)
+  groupId      String
+  userId       String
+  recurring    Boolean  @default(false)
+  hasPoll      Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
   group        Group              @relation(fields: [groupId], references: [id])
   user         User               @relation(fields: [userId], references: [id])
   participants OutingParticipant[]
+  pollOptions  OutingPollOption[]
   messages     Message[]
 }
 
 model OutingParticipant {
-  id       String   @id @default(cuid())
+  id       String              @id @default(cuid())
   outingId String
   userId   String
-  joinedAt DateTime @default(now())
+  status   ParticipationStatus
+  joinedAt DateTime            @default(now())
 
   outing Outing @relation(fields: [outingId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
 
   @@unique([outingId, userId])
+}
+
+model OutingPollOption {
+  id       String   @id @default(cuid())
+  outingId String
+  dateTime DateTime
+
+  outing Outing           @relation(fields: [outingId], references: [id])
+  votes  OutingPollVote[]
+}
+
+model OutingPollVote {
+  id       String @id @default(cuid())
+  optionId String
+  userId   String
+
+  option OutingPollOption @relation(fields: [optionId], references: [id])
+  user   User             @relation(fields: [userId], references: [id])
+
+  @@unique([optionId, userId])
 }
