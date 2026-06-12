@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { verifyToken } from "./auth";
+import { prisma } from "./prisma";
 
 declare global {
   namespace Express {
@@ -24,4 +25,20 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 
   req.userId = userId;
   next();
+}
+
+export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  requireAuth(req, res, async () => {
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { role: true },
+    });
+
+    if (!user || user.role !== "ADMIN") {
+      res.status(403).json({ error: "Accès réservé aux administrateurs." });
+      return;
+    }
+
+    next();
+  });
 }
