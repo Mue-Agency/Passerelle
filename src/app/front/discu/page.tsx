@@ -117,18 +117,6 @@ export default function DiscussionPage() {
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
         <div className="w-full flex justify-center items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
 
-<<<<<<< Updated upstream
-          <div className="flex flex-col items-center justify-center gap-[4px]">
-
-            <img
-              src="/assets/group-placeholder.png"
-              alt="Photo de groupe"
-              className="w-8 h-8 rounded-full"
-            />
-            <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
-              {groupName ?? "..."}
-            </h1>
-=======
   <div
     className="flex flex-col items-center justify-center gap-[4px] cursor-pointer"
     onClick={() => router.push("/front/membre")}
@@ -146,8 +134,6 @@ export default function DiscussionPage() {
         alt="Profil 2"
         className="relative z-20 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
       />
->>>>>>> Stashed changes
-
       <img
         src="/assets/group-placeholder.png"
         alt="Profil 3"
