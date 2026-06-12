@@ -115,10 +115,21 @@ export default function DiscussionPage() {
       <main className="flex w-full max-w-md h-full flex-col relative">
 
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
-        <div className="w-full flex justify-center items-center h-[52px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
-          <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate ">
-            {groupName ?? "..."}
-          </h1>
+        <div className="w-full flex justify-center items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
+
+          <div className="flex flex-col items-center justify-center gap-[4px]">
+
+            <img
+              src="/assets/group-placeholder.png"
+              alt="Photo de groupe"
+              className="w-8 h-8 rounded-full"
+            />
+            <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
+              {groupName ?? "..."}
+            </h1>
+
+          </div>
+
         </div>
 
         {/* FIL D'ACTIVITÉ — px-[24px], gap-[24px] */}
@@ -265,45 +276,95 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
 }
 
 /* ─── SpotsIndicator — dots 12x12, gap-[8px] ─── */
-
-function SpotsIndicator({ participantCount, maxSpots, isMe }: { participantCount: number; maxSpots: number; isMe: boolean }) {
-  return (
-    <div className="flex items-center gap-[8px]">
-      {Array.from({ length: maxSpots }, (_, i) => (
-        <span
-          key={i}
-          className={`w-[12px] h-[12px] rounded-full ${
-            i < participantCount
-              ? isMe ? "bg-white" : "bg-[#426200]"
-              : isMe ? "border-2 border-white/50" : "border-2 border-[#C1C8C1]"
-          }`}
-        />
-      ))}
-    </div>
-  );
-}
+    function SpotsIndicator({
+      participantCount,
+      participantCountrefused,
+      maxSpots,
+      isMe,
+      onClick,
+    }: {
+      participantCount: number;
+      participantCountrefused: number;
+      
+      maxSpots: number;
+      isMe: boolean;
+      onClick?: () => void;
+    }) {
+      return (
+        <button
+          type="button"
+          onClick={onClick}
+          className="flex items-center gap-[8px] cursor-pointer"
+        >
+          {Array.from({ length: maxSpots }, (_, i) => (
+            <span
+              key={i}
+              className={`w-[12px] h-[12px] rounded-full ${
+                i < participantCount
+                  ? isMe
+                    ? "bg-white"
+                    : "bg-[#426200]"
+                  : isMe
+                  ? "border-2 border-white/50"
+                  : "border-2 border-[#C1C8C1]"
+              }`}
+            />
+          ))}
+        </button>
+      );
+    }
 
 /* ─── OutingCard ─── */
+    function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+      const router = useRouter();
+      const [isActing, setIsActing] = useState(false);
 
-function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
-  const router = useRouter();
-  const [isActing, setIsActing] = useState(false);
+      if (!msg.outing) return null;
+      const { outing } = msg;
+      const spotsLeft = outing.maxSpots - outing.participantCount;
 
-  if (!msg.outing) return null;
-  const { outing } = msg;
-  const spotsLeft = outing.maxSpots - outing.participantCount;
+      const [showParticipants, setShowParticipants] = useState(false);
+      const [hasJoined, setHasJoined] = useState(false);
+      const [hasRefused, setHasRefused] = useState(false);
 
-  async function handleJoin() {
-    setIsActing(true);
-    await outingsService.joinOuting(outing.id);
-    setIsActing(false);
-  }
+      async function handleJoin() {
+        setHasJoined(true);
+        setHasRefused(false);
 
-  async function handleLeave() {
-    setIsActing(true);
-    await outingsService.leaveOuting(outing.id);
-    setIsActing(false);
-  }
+        try {
+          await outingsService.joinOuting(outing.id);
+        } catch (e) {
+          setHasJoined(false);
+        }
+      }
+
+      async function handleLeave() {
+        setHasJoined(false);
+
+        try {
+          await outingsService.leaveOuting(outing.id);
+        } catch (e) {
+          setHasJoined(true);
+        }
+      }
+
+      async function handleRefuse() {
+        setHasRefused(true);
+        setHasJoined(false);
+
+      }
+  
+
+    function formatShortDate(date: Date | string): string {
+      return new Date(date).toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+      });
+    }
+
+    function AuthorName(user: MessageOut["user"]): string {
+      return `${user.firstName} ${user.lastName.charAt(0)}.`;
+    }
 
   return (
     <div className={`flex flex-col w-full ${isMe ? "items-end pl-[56px]" : "items-start pr-[56px]"}`}>
@@ -331,11 +392,24 @@ function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
             <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843] dark:text-zinc-400"}`}>
               Places : {outing.participantCount}/{outing.maxSpots}
             </p>
-            <SpotsIndicator participantCount={outing.participantCount} maxSpots={outing.maxSpots} isMe={isMe} />
+            {/* <SpotsIndicator participantCount={outing.participantCount} maxSpots={outing.maxSpots} isMe={isMe} /> */}
+            {/* <SpotsIndicator
+              participantCount={outing.participantCount}
+              participantCountrefused={outing.participantCountrefused}
+              maxSpots={outing.maxSpots}
+              isMe={isMe}
+              onClick={() => setShowParticipants(true)}
+            /> */}
+           </div>
+          <div className="flex items-center">
+            <img className="w-8 h-8 rounded-full -ml-2 first:ml-0 border border-white" src="/assets/group-placeholder.png" />
+            <img className="w-8 h-8 rounded-full -ml-2 border border-white" src="/assets/group-placeholder.png" />
+            <img className="w-8 h-8 rounded-full -ml-2 border border-white" src="/assets/group-placeholder.png" />
           </div>
         </div>
 
         {/* Bouton — rounded-[8px], py-[8px] px-[24px], text-[16px] font-semibold */}
+        <div className="flex flex-col gap-[8px]">
         {isMe ? (
           <button
             onClick={() => router.push(`/front/sorti?outingId=${outing.id}`)}
@@ -343,28 +417,106 @@ function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
           >
             Modifier
           </button>
-        ) : outing.isParticipant ? (
-          <button
-            onClick={handleLeave}
-            disabled={isActing}
-            className="w-full rounded-[8px] border-2 border-[#426200] text-[#426200] bg-transparent text-[16px] font-semibold py-[8px] px-[24px] hover:bg-[#426200]/5 transition disabled:opacity-50 cursor-pointer text-center"
-          >
-            {isActing ? "..." : "Quitter"}
-          </button>
-        ) : spotsLeft === 0 ? (
-          <div className="w-full rounded-[8px] bg-zinc-100 dark:bg-zinc-800 text-[#424843] text-[16px] font-semibold py-[8px] px-[24px] text-center">
-            Complet
+        ) : (
+          <>
+            {hasJoined ? (
+              <button
+                onClick={handleLeave}
+                className="w-full rounded-[8px] border-2 border-[#152646] text-[#152646] bg-transparent text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
+              >
+                Quitter
+              </button>
+            ) : (
+              <button
+                onClick={handleJoin}
+                className="w-full rounded-[8px] bg-[#152646] text-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
+              >
+              Continuer
+            </button>
+          )}
+
+        {hasRefused ? (
+          <div className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] text-center">
+            Vous avez refusé
           </div>
         ) : (
           <button
-            onClick={handleJoin}
-            disabled={isActing}
-            className="w-full rounded-[8px] bg-[#152646] text-white text-[16px] font-semibold py-[8px] px-[24px] hover:opacity-90 transition disabled:opacity-50 cursor-pointer text-center"
+            onClick={handleRefuse}
+            className="w-full rounded-[8px] border border-[#C1C8C1] text-[#727973] bg-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
           >
-            {isActing ? "..." : "Continuer"}
+            Refuser
           </button>
         )}
-      </div>
+      </>
+    )}
+    </div>
+          </div>
+
+      {showParticipants && (
+        <div className="fixed inset-0 z-50 flex items-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowParticipants(false)} />
+
+            <div className="relative w-full max-w-md mx-auto h-[50vh] bg-white dark:bg-zinc-900 rounded-t-[24px] p-[20px] animate-slideUp overflow-hidden">
+            <div className="w-[40px] h-[4px] bg-zinc-300 rounded-full mx-auto mb-[20px]" />
+
+            <div className="flex items-center justify-between mb-[16px]">
+              <p>
+                {outing.location}
+              </p>
+              {outing.date && (
+                <span className="text-[14px] text-[#727973]">
+                  {formatShortDate(outing.date)}
+                </span>
+              )}
+            </div>
+
+            <h3 className="text-[18px] font-semibold mb-[12px] ml-[40px] text-[#001A0E] dark:text-zinc-50 leading-normal">
+                Participants 
+            </h3>
+
+            <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
+              Acceptés :  {outing.participantCount}
+            </h5>
+
+            <div className="flex flex-col gap-[12px] overflow-y-auto">
+              {Array.from({ length: outing.participantCount }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
+                >
+                  <img
+                    src="/assets/group-placeholder.png"
+                    alt="Photo de profil"
+                    className="w-8 h-8 rounded-full"
+                  />
+
+                  <span>
+                    {AuthorName(msg.user)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
+              Refusés :  {outing.participantCountrefused}
+            </h5>
+
+            <div className="flex flex-col gap-[12px] overflow-y-auto">
+              {Array.from({ length: outing.participantCountrefused }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
+                >
+                  <div className="w-10 h-10 rounded-full bg-zinc-300" />
+                  <span>Participant </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[300px] bg-gradient-to-t from-pink-200/70 via-pink-100/30 to-transparent" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
