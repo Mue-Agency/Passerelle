@@ -117,6 +117,7 @@ export default function DiscussionPage() {
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
         <div className="w-full flex justify-center items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
 
+<<<<<<< Updated upstream
           <div className="flex flex-col items-center justify-center gap-[4px]">
 
             <img
@@ -127,10 +128,61 @@ export default function DiscussionPage() {
             <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
               {groupName ?? "..."}
             </h1>
+=======
+  <div
+    className="flex flex-col items-center justify-center gap-[4px] cursor-pointer"
+    onClick={() => router.push("/front/membre")}
+  >
+    {/* Avatars superposés */}
+    <div className="flex -space-x-3">
+      <img
+        src="/assets/group-placeholder.png"
+        alt="Profil 1"
+        className="relative z-30 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
+      />
 
-          </div>
+      <img
+        src="/assets/group-placeholder.png"
+        alt="Profil 2"
+        className="relative z-20 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
+      />
+>>>>>>> Stashed changes
 
-        </div>
+      <img
+        src="/assets/group-placeholder.png"
+        alt="Profil 3"
+        className="relative z-10 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
+      />
+    </div>
+
+    {/* Nom + icône */}
+    <div className="flex items-center gap-[8px]">
+      <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
+        {groupName ?? "..."}
+      </h1>
+
+      <div className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-[#E3EBF9]">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="19"
+          viewBox="0 0 16 19"
+          fill="none" onClick={(e) => { e.stopPropagation(); router.push("/front/profil") }}
+        >
+          <path
+            d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z"
+            fill="#152646"
+          />
+          <path
+            d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z"
+            fill="#152646"
+          />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</div>
 
         {/* FIL D'ACTIVITÉ — px-[24px], gap-[24px] */}
         <div ref={scrollContainerRef} className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto scrollbar-none">
