@@ -117,9 +117,10 @@ export default function DiscussionPage() {
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
         <div className="w-full flex justify-center items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
 
-          <div className="flex flex-col items-center justify-center gap-[4px]">
+          <div className="flex flex-col items-center justify-center gap-[4px]"  onClick={() => router.push("/front/membre")}>
 
             <img
+            // onclick={() => router.push("/front/membre")}
               src="/assets/group-placeholder.png"
               alt="Photo de groupe"
               className="w-8 h-8 rounded-full"
@@ -401,7 +402,7 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
               onClick={() => setShowParticipants(true)}
             /> */}
            </div>
-          <div className="flex items-center">
+          <div className="flex items-center" onClick={() => setShowParticipants(true)}>
             <img className="w-8 h-8 rounded-full -ml-2 first:ml-0 border border-white" src="/assets/group-placeholder.png" />
             <img className="w-8 h-8 rounded-full -ml-2 border border-white" src="/assets/group-placeholder.png" />
             <img className="w-8 h-8 rounded-full -ml-2 border border-white" src="/assets/group-placeholder.png" />
