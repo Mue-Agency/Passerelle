@@ -37,7 +37,7 @@ groupsRouter.post("/", requireAdmin, async (req, res) => {
 
 groupsRouter.get("/:groupId", async (req, res) => {
   try {
-    const result = await getGroup({ groupId: req.params.groupId });
+    const result = await getGroup({ groupId: req.params.groupId as string });
     res.json(result);
   } catch (err: unknown) {
     if (err instanceof Error && err.message === "GROUP_NOT_FOUND") {
@@ -49,7 +49,7 @@ groupsRouter.get("/:groupId", async (req, res) => {
 });
 
 groupsRouter.get("/:groupId/members", async (req, res) => {
-  const groupId = req.params.groupId as string;
+  const groupId = req.params.groupId as string as string;
 
   try {
     const group = await prisma.group.findUnique({
@@ -85,7 +85,7 @@ groupsRouter.post("/:groupId/join", requireAuth, async (req, res) => {
   try {
     const result = await joinGroup({
       userId: req.userId!,
-      groupId: req.params.groupId,
+      groupId: req.params.groupId as string,
     });
     res.status(201).json(result);
   } catch (err: unknown) {
