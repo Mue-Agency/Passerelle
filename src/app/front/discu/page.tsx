@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -118,74 +118,79 @@ export default function DiscussionPage() {
   if (!isReady) return null;
 
   return (
-    // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans dark:bg-black overflow-hidden">
-      <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5] dark:bg-black">
+    // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans overflow-hidden">
+      <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5]">
       <main className="flex w-full max-w-md h-full flex-col relative">
 
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
-        <div className="w-full flex justify-center items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
+        <div className="w-full flex items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] sticky top-0 z-10">
 
-  <div
-    className="flex flex-col items-center justify-center gap-[4px] cursor-pointer"
-    onClick={() => router.push("/front/membre")}
-  >
-    {/* Avatars superposés */}
-    <div className="flex -space-x-3">
-      {members.slice(0, 3).map((m, i) => (
-        <img
-          key={m.id}
-          src={m.avatarUrl ?? "/assets/group-placeholder.png"}
-          alt={`${m.firstName} ${m.lastName}`}
-          className={`relative w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 ${["z-30", "z-20", "z-10"][i]}`}
-        />
-      ))}
-    </div>
+          {/* Espace symétrique à gauche */}
+          <div className="w-[40px] flex-shrink-0" />
 
-    {/* Nom + icône */}
-    <div className="flex items-center gap-[8px]">
-      <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
-        {groupName ?? "..."}
-      </h1>
+          {/* Groupe — centre */}
+          <div
+            className="flex-1 flex flex-col items-center justify-center gap-[4px] cursor-pointer"
+            onClick={() => router.push("/front/membre")}
+          >
+            <div className="flex -space-x-3">
+              {members.slice(0, 3).map((m, i) => (
+                m.avatarUrl ? (
+                  <img
+                    key={m.id}
+                    src={m.avatarUrl}
+                    alt={`${m.firstName} ${m.lastName}`}
+                    className={`w-8 h-8 rounded-full border-2 border-white object-cover ${["z-30", "z-20", "z-10"][i]}`}
+                  />
+                ) : (
+                  <img
+                    key={m.id}
+                    src="/pdp.png"
+                    alt={`${m.firstName} ${m.lastName}`}
+                    className={`w-8 h-8 rounded-full border-2 border-white object-cover ${["z-30", "z-20", "z-10"][i]}`}
+                  />
+                )
+              ))}
+            </div>
+            <h1 className="text-[20px] font-bold text-[#001A0E] leading-[28px] tracking-[-0.5px] truncate">
+              {groupName ?? "..."}
+            </h1>
+          </div>
 
-      <div className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-[#E3EBF9]">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="19"
-          viewBox="0 0 16 19"
-          fill="none" onClick={(e) => { e.stopPropagation(); router.push("/front/profil") }}
-        >
-          <path
-            d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z"
-            fill="#152646"
-          />
-          <path
-            d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z"
-            fill="#152646"
-          />
-        </svg>
-      </div>
-    </div>
-  </div>
+          {/* Bouton profil — droite */}
+          <button
+            onClick={() => router.push("/front/profil")}
+            className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-[#E3EBF9] flex-shrink-0 overflow-hidden"
+          >
+            {members.find((m) => m.id === myUserId)?.avatarUrl ? (
+              <img
+                src={members.find((m) => m.id === myUserId)!.avatarUrl!}
+                alt="Mon profil"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img src="/pdp.png" alt="Mon profil" className="w-full h-full object-cover" />
+            )}
+          </button>
 
-</div>
+        </div>
 
         {/* FIL D'ACTIVITÉ — px-[24px], gap-[24px] */}
         <div ref={scrollContainerRef} className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto scrollbar-none">
 
           {/* Carte de bienvenue — px-[32px] intérieur, card p-[16px], rounded-[12px] */}
           <div className="px-[32px]">
-            <div className="flex flex-col gap-[24px] items-start p-[16px] bg-[#E3EBF9] dark:bg-zinc-900 rounded-[12px] w-full">
-              <div className="w-full flex flex-col gap-[16px] text-center text-[#001A0E] dark:text-zinc-50">
+            <div className="flex flex-col gap-[24px] items-start p-[16px] bg-[#E3EBF9] rounded-[12px] w-full">
+              <div className="w-full flex flex-col gap-[16px] text-center text-[#001A0E]">
                 <h2 className="text-[18px] font-bold leading-normal">
                   Bienvenue dans le groupe !
                 </h2>
-                <p className="text-[14px] leading-normal text-[#001A0E] dark:text-zinc-400">
+                <p className="text-[14px] leading-normal text-[#001A0E]">
                   Ce groupe réunit des personnes que vous avez peut-être déjà croisées ici.
                 </p> 
               </div>
               <div className="w-full flex flex-col gap-[16px] items-start">
-                <p className="text-[16px] font-semibold text-[#001A0E] dark:text-zinc-300 text-center w-full leading-normal">
+                <p className="text-[16px] font-semibold text-[#001A0E] text-center w-full leading-normal">
                   Pour commencer, vous pouvez proposer un moment ensemble
                 </p>
                 <button
@@ -202,7 +207,7 @@ export default function DiscussionPage() {
           </div>
 
           {/* Infos système — text-[14px], text-[#424843] */}
-          <div className="text-center text-[14px] text-[#424843] dark:text-zinc-400 leading-normal">
+          <div className="text-center text-[14px] text-[#424843] leading-normal">
             Groupe modéré pour garantir la sécurité de tous.
           </div>
 
@@ -212,7 +217,7 @@ export default function DiscussionPage() {
           ) : (
             <div className="flex flex-col gap-[16px]">
               {messages.map((msg) => (
-                <MessageItem key={msg.id} msg={msg} isMe={msg.user.id === myUserId} />
+                <MessageItem key={msg.id} msg={msg} isMe={msg.user.id === myUserId} myUserId={myUserId} members={members} />
               ))}
             </div>
           )}
@@ -238,11 +243,11 @@ export default function DiscussionPage() {
         )}
 
         {/* ZONE DE SAISIE — px-[16px], pt-[17px] pb-[16px], border-t */}
-        <div className="w-full px-[16px] pt-[17px] pb-[16px] bg-[#FAF9F5] dark:bg-black border-t border-[rgba(193,200,193,0.2)] flex items-center gap-[12px]">
+        <div className="w-full px-[16px] pt-[17px] pb-[16px] bg-[#FAF9F5] border-t border-[rgba(193,200,193,0.2)] flex items-center gap-[12px]">
           <button
             type="button"
             onClick={() => router.push("/front/sorti")}
-            className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] dark:text-zinc-300 hover:opacity-70 transition cursor-pointer flex-shrink-0"
+            className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] hover:opacity-70 transition cursor-pointer flex-shrink-0"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20" fill="none">
               <path fillRule="evenodd" clipRule="evenodd" d="M14 17V20H16V17H19V15H16V12H14V15H11V17H14ZM0.5875 17.4125C0.979167 17.8042 1.45 18 2 18H9V16H2V8H14V10.025H16V4C16 3.45 15.8042 2.97917 15.4125 2.5875C15.0208 2.19583 14.55 2 14 2H13V0H11V2H5V0H3V2H2C1.45 2 0.979167 2.19583 0.5875 2.5875C0.195833 2.97917 0 3.45 0 4V16C0 16.55 0.195833 17.0208 0.5875 17.4125ZM14 6H2V4H14V6Z" fill="#152646"/>
@@ -250,13 +255,13 @@ export default function DiscussionPage() {
           </button>
  
           <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-[12px]">
-            <div className="bg-[#EFEEEA] dark:bg-zinc-900 rounded-full px-[24px] py-[16px] flex-1">
+            <div className="bg-[#EFEEEA] rounded-full px-[24px] py-[16px] flex-1">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Écrire un message..."
-                className="w-full bg-transparent outline-none text-[16px] text-[#001A0E] dark:text-zinc-50 placeholder-[#727973] leading-normal"
+                className="w-full bg-transparent outline-none text-[16px] text-[#001A0E] placeholder-[#727973] leading-normal"
               />
             </div>
             <button
@@ -279,30 +284,30 @@ export default function DiscussionPage() {
 
 /* ─── MessageItem ─── */
 
-function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: boolean; myUserId: string | null; members: { id: string; firstName: string; lastName: string; avatarUrl: string | null }[] }) {
   if (msg.type === "JOIN") {
     return (
-      <div className="text-center text-[14px] text-[#424843] dark:text-zinc-400 leading-normal">
+      <div className="text-center text-[14px] text-[#424843] leading-normal">
         {AuthorName(msg.user)} a rejoint le groupe
       </div>
     );
   }
 
   if (msg.type === "OUTING" && msg.outing) {
-    return <OutingCard msg={msg} isMe={isMe} />;
+    return <OutingCard msg={msg} isMe={isMe} myUserId={myUserId} members={members} />;
   }
 
   return (
     <div className={`flex flex-col w-full ${isMe ? "items-end pl-[56px]" : "items-start pr-[56px]"}`}>
       {!isMe && (
-        <span className="text-[14px] text-[#424843] dark:text-zinc-400 mb-[4px] leading-normal">
+        <span className="text-[14px] text-[#424843] mb-[4px] leading-normal">
           {AuthorName(msg.user)}
         </span>
       )}
       <div className={`max-w-[286px] rounded-[12px] p-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex gap-[8px] items-end ${
         isMe
           ? "bg-[#152546] text-white rounded-tl-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tr-none"
-          : "bg-white dark:bg-zinc-900 text-[#E3EBF9] dark:text-zinc-50 rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
+          : "bg-[#E3EBF9] text-[#001A0E] rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
       }`}>
         <p className="break-words leading-normal text-[16px] flex-1 min-w-0">{msg.content}</p>
         <span className={`text-[12px] leading-[18px] whitespace-nowrap flex-shrink-0 ${isMe ? "text-white/70" : "text-[#727973]"}`}>
@@ -353,18 +358,29 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
     }
 
 /* ─── OutingCard ─── */
-    function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+    function OutingCard({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: boolean; myUserId: string | null; members: { id: string; firstName: string; lastName: string; avatarUrl: string | null }[] }) {
       const router = useRouter();
       const [isActing, setIsActing] = useState(false);
       const [showParticipants, setShowParticipants] = useState(false);
       const [hasJoined, setHasJoined] = useState(msg.outing?.isParticipant ?? false);
       const [hasRefused, setHasRefused] = useState(false);
       const [participants, setParticipants] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+      const [refusedParticipants, setRefusedParticipants] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+
+      const currentUser = myUserId ? members.find((m) => m.id === myUserId) ?? null : null;
 
       useEffect(() => {
         if (!msg.outing) return;
         outingsService.getOuting(msg.outing.id).then((result) => {
-          if (result.isOk) setParticipants(result.data.participants);
+          if (!result.isOk) return;
+          setParticipants(result.data.participants);
+          setHasJoined(result.data.isParticipant);
+          if (result.data.refusedParticipants) {
+            setRefusedParticipants(result.data.refusedParticipants);
+            if (myUserId) {
+              setHasRefused(result.data.refusedParticipants.some((p) => p.id === myUserId));
+            }
+          }
         });
       }, [msg.outing?.id]);
 
@@ -375,32 +391,45 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       async function handleJoin() {
         setHasJoined(true);
         setHasRefused(false);
-
+        if (currentUser) {
+          setParticipants((prev) =>
+            prev.some((p) => p.id === currentUser.id) ? prev : [...prev, currentUser]
+          );
+          setRefusedParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
+        }
         try {
           await outingsService.joinOuting(outing.id);
-        } catch (e) {
+        } catch {
           setHasJoined(false);
+          if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
       }
 
       async function handleLeave() {
         setHasJoined(false);
-
+        if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         try {
           await outingsService.leaveOuting(outing.id);
-        } catch (e) {
+        } catch {
           setHasJoined(true);
+          if (currentUser) setParticipants((prev) => [...prev, currentUser]);
         }
       }
 
       async function handleRefuse() {
         setHasRefused(true);
         setHasJoined(false);
-
+        if (currentUser) {
+          setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
+          setRefusedParticipants((prev) =>
+            prev.some((p) => p.id === currentUser.id) ? prev : [...prev, currentUser]
+          );
+        }
         try {
           await outingsService.refuseOuting(outing.id);
-        } catch (e) {
+        } catch {
           setHasRefused(false);
+          if (currentUser) setRefusedParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
       }
   
@@ -421,25 +450,25 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       <div className={`w-full rounded-[12px] p-[16px] flex flex-col gap-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] ${
         isMe
           ? "bg-[#152646] text-white"
-          : "bg-white dark:bg-zinc-900 text-[#001A0E] dark:text-zinc-50"
+          : "bg-[#E3EBF9] text-[#001A0E]"
       }`}>
         {/* Contenu */}
         <div className="flex flex-col gap-[12px]">
           <div className="flex flex-col gap-[8px]">
-            <p className={`text-[18px] font-semibold leading-normal ${isMe ? "text-white" : "text-[#001A0E] dark:text-zinc-100"}`}>
+            <p className={`text-[18px] font-semibold leading-normal ${isMe ? "text-white" : "text-[#001A0E]"}`}>
               {outing.title}
             </p>
             <div className="flex flex-col gap-[4px]">
-              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E] dark:text-zinc-300"}`}>
+              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E]"}`}>
                 {formatOutingDate(outing.date)}
               </p>
-              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E] dark:text-zinc-300"}`}>
+              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E]"}`}>
                 {outing.location}
               </p>
             </div>
           </div>
           <div className="flex flex-col gap-[4px]">
-            <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843] dark:text-zinc-400"}`}>
+            <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843]"}`}>
               Places : {outing.participantCount}/{outing.maxSpots}
             </p>
             {/* <SpotsIndicator participantCount={outing.participantCount} maxSpots={outing.maxSpots} isMe={isMe} /> */}
@@ -451,19 +480,33 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
               onClick={() => setShowParticipants(true)}
             /> */}
            </div>
-          <div className="flex items-center">
-            {participants.map((p, i) => (
-              <img
-                key={p.id}
-                className={`w-8 h-8 rounded-full border border-white ${i === 0 ? "" : "-ml-2"}`}
-                src="/assets/group-placeholder.png"
-                alt={`${p.firstName} ${p.lastName}`}
-              />
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowParticipants(true)}
+            className="flex items-center gap-[8px] hover:opacity-70 transition cursor-pointer"
+          >
+            <div className="flex items-center">
+              {participants.map((p, i) => (
+                <img
+                  key={p.id}
+                  className={`w-8 h-8 rounded-full border-2 ${isMe ? "border-white/30" : "border-white"} ${i === 0 ? "" : "-ml-2"}`}
+                  src="/pdp.png"
+                  alt={`${p.firstName} ${p.lastName}`}
+                />
+              ))}
+              {participants.length === 0 && (
+                <span className={`text-[13px] ${isMe ? "text-white/60" : "text-[#727973]"}`}>Aucun participant</span>
+              )}
+            </div>
+            {participants.length > 0 && (
+              <span className={`text-[13px] ${isMe ? "text-white/70" : "text-[#727973]"}`}>
+                Voir ({participants.length})
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Bouton — rounded-[8px], py-[8px] px-[24px], text-[16px] font-semibold */}
+        {/* Boutons action */}
         <div className="flex flex-col gap-[8px]">
         {isMe ? (
           <button
@@ -486,92 +529,114 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
                 onClick={handleJoin}
                 className="w-full rounded-[8px] bg-[#152646] text-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
               >
-              Continuer
-            </button>
-          )}
+                Continuer
+              </button>
+            )}
 
-        {hasRefused ? (
-          <div className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] text-center">
-            Vous avez refusé
-          </div>
-        ) : (
-          <button
-            onClick={handleRefuse}
-            className="w-full rounded-[8px] border border-[#C1C8C1] text-[#727973] bg-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
-          >
-            Refuser
-          </button>
+            {hasRefused ? (
+              <button
+                onClick={handleJoin}
+                className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
+              >
+                Vous avez refusé 
+              </button>
+            ) : (
+              <button
+                onClick={handleRefuse}
+                className="w-full rounded-[8px] border border-[#C1C8C1] text-[#727973] bg-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
+              >
+                Refuser
+              </button>
+            )}
+          </>
         )}
-      </>
-    )}
-    </div>
+        </div>
           </div>
 
       {showParticipants && (
         <div className="fixed inset-0 z-50 flex items-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowParticipants(false)} />
 
-            <div className="relative w-full max-w-md mx-auto h-[50vh] bg-white dark:bg-zinc-900 rounded-t-[24px] p-[20px] animate-slideUp overflow-hidden">
-            <div className="w-[40px] h-[4px] bg-zinc-300 rounded-full mx-auto mb-[20px]" />
-
-            <div className="flex items-center justify-between mb-[16px]">
-              <p>
-                {outing.location}
-              </p>
-              {outing.date && (
-                <span className="text-[14px] text-[#727973]">
-                  {formatShortDate(outing.date)}
-                </span>
-              )}
+          <div className="relative w-full max-w-md mx-auto h-[60vh] bg-white rounded-t-[24px] flex flex-col overflow-hidden">
+            {/* Handle */}
+            <div className="flex-shrink-0 pt-[12px] pb-[4px] px-[20px]">
+              <div className="w-[40px] h-[4px] bg-zinc-300 rounded-full mx-auto" />
             </div>
 
-            <h3 className="text-[18px] font-semibold mb-[12px] ml-[40px] text-[#001A0E] dark:text-zinc-50 leading-normal">
-                Participants 
-            </h3>
+            {/* Header */}
+            <div className="flex-shrink-0 flex items-center justify-between px-[20px] py-[12px] border-b border-zinc-100">
+              <div>
+                <p className="text-[16px] font-semibold text-[#001A0E]">{outing.title}</p>
+                <p className="text-[13px] text-[#727973]">{formatShortDate(outing.date)}</p>
+              </div>
+              <button type="button" onClick={() => setShowParticipants(false)} className="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-zinc-100 text-[#727973] cursor-pointer hover:opacity-70 transition">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
 
-            <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
-              Acceptés :  {participants.length}
-            </h5>
+            {/* Contenu scrollable */}
+            <div className="relative flex-1 min-h-0">
+            <div className="h-full overflow-y-auto px-[20px] py-[16px] flex flex-col gap-[20px]">
 
-            <div className="flex flex-col gap-[12px] overflow-y-auto">
-              {participants.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
-                >
-                  <img
-                    src="/assets/group-placeholder.png"
-                    alt={`${p.firstName} ${p.lastName}`}
-                    className="w-8 h-8 rounded-full"
-                  />
-
-                  <span>
-                    {p.firstName} {p.lastName.charAt(0)}.
-                  </span>
+              {/* Acceptés */}
+              <div className="flex flex-col gap-[10px]">
+                <div className="flex items-center gap-[8px]">
+                  <div className="w-[24px] h-[24px] rounded-full bg-[#E8F5E9] flex items-center justify-center flex-shrink-0">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#426200" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <span className="text-[14px] font-semibold text-[#426200]">Acceptés · {participants.length}</span>
                 </div>
-              ))}
-            </div>
+                {participants.length === 0 ? (
+                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun participant pour l'instant</p>
+                ) : (
+                  <div className="flex flex-col gap-[8px]">
+                    {participants.map((p) => (
+                      <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-[#F4FAF0]">
+                        <img src="/pdp.png" alt={`${p.firstName} ${p.lastName}`} className="w-[36px] h-[36px] rounded-full flex-shrink-0" />
+                        <span className="text-[14px] font-medium text-[#001A0E]">{p.firstName} {p.lastName.charAt(0)}.</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
-              Refusés :  {outing.participantCountrefused}
-            </h5>
-
-            <div className="flex flex-col gap-[12px] overflow-y-auto">
-              {Array.from({ length: outing.participantCountrefused }).map((_, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
-                >
-                  <div className="w-10 h-10 rounded-full bg-zinc-300" />
-                  <span>Participant </span>
+              {/* Refusés */}
+              <div className="flex flex-col gap-[10px]">
+                <div className="flex items-center gap-[8px]">
+                  <div className="w-[24px] h-[24px] rounded-full bg-zinc-100 flex items-center justify-center flex-shrink-0">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#727973" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </div>
+                  <span className="text-[14px] font-semibold text-[#727973]">Refusés · {refusedParticipants.length}</span>
                 </div>
-              ))}
-            </div>
+                {refusedParticipants.length === 0 ? (
+                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun refus pour l'instant</p>
+                ) : (
+                  <div className="flex flex-col gap-[8px]">
+                    {refusedParticipants.map((p) => {
+                      const member = members.find((m) => m.id === p.id);
+                      return (
+                        <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-zinc-50">
+                          {member?.avatarUrl ? (
+                            <img src={member.avatarUrl} alt={p.firstName} className="w-[36px] h-[36px] rounded-full object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-[36px] h-[36px] rounded-full bg-zinc-200 flex-shrink-0" />
+                          )}
+                          <span className="text-[14px] text-[#727973]">{p.firstName} {p.lastName.charAt(0)}.</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[300px] bg-gradient-to-t from-pink-200/70 via-pink-100/30 to-transparent" />
+            </div>
+              {/* Dégradé rose en bas */}
+              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-pink-100 to-transparent" />
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 }
+
