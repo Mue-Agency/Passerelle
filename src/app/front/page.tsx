@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authService } from "@/app/services/auth.service";
 
-export default function FrontPage() {
+function FrontForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const groupId = searchParams.get("groupId");
@@ -160,5 +160,13 @@ export default function FrontPage() {
 
         </main>
       </div>
+  );
+}
+
+export default function FrontPage() {
+  return (
+      <Suspense>
+        <FrontForm />
+      </Suspense>
   );
 }
