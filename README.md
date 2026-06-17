@@ -15,6 +15,11 @@ Le dépôt contient trois applications, avec une API commune aux deux front-ends
 - Node.js 20+
 - PostgreSQL
 
+## Liens utils en prod
+
+- front                    #https://alouette.mue.agency/    Attention qr code requis. Pas de groupe par défaut
+- dash                     #https://dash.alouette.mue.agency/  L'inscription à l'espace dash requiret un code spécifique.
+  
 ## Installation et lancement
 
 ```bash
