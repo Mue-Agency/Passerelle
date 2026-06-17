@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Passerelle",
   description: "Application passerelle",
+  icons: { icon: "/plume.svg" },
 };
 
 export default function RootLayout({
