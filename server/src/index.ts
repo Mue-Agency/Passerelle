@@ -19,6 +19,10 @@ import { errorMapper } from "./lib/errorMapper";
 const app = express();
 const httpServer = createServer(app);
 
+// Derrière le proxy Render (+ Cloudflare) : nécessaire pour que express-rate-limit
+// lise correctement l'IP via X-Forwarded-For. Sinon ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+app.set("trust proxy", 1);
+
 const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/+$/, "");
 const DASH_URL = (process.env.DASH_URL || "http://localhost:3001").replace(/\/+$/, "");
 const allowedOrigins = [FRONTEND_URL, DASH_URL];
