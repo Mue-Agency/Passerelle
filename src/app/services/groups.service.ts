@@ -1,7 +1,7 @@
 import { request } from "./_http";
 
 type GroupOut = { id: string; name: string; lieu: string };
-type MemberOut = { id: string; firstName: string; lastName: string; avatarUrl: string | null };
+type MemberOut = { id: string; firstName: string; lastName: string; avatarUrl: string | null; createdAt?: string; interests?: string[] };
 
 type GroupMembersOut = { members: MemberOut[] };
 

@@ -123,52 +123,63 @@ export default function DiscussionPage() {
       <main className="flex w-full max-w-md h-full flex-col relative">
 
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
-        <div className="w-full flex justify-center items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
+        <div className="w-full flex items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
 
-  <div
-    className="flex flex-col items-center justify-center gap-[4px] cursor-pointer"
-    onClick={() => router.push("/front/membre")}
-  >
-    {/* Avatars superposés */}
-    <div className="flex -space-x-3">
-      {members.slice(0, 3).map((m, i) => (
-        <img
-          key={m.id}
-          src={m.avatarUrl ?? "/assets/group-placeholder.png"}
-          alt={`${m.firstName} ${m.lastName}`}
-          className={`relative w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 ${["z-30", "z-20", "z-10"][i]}`}
-        />
-      ))}
-    </div>
+          {/* Espace symétrique à gauche */}
+          <div className="w-[40px] flex-shrink-0" />
 
-    {/* Nom + icône */}
-    <div className="flex items-center gap-[8px]">
-      <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
-        {groupName ?? "..."}
-      </h1>
+          {/* Groupe — centre */}
+          <div
+            className="flex-1 flex flex-col items-center justify-center gap-[4px] cursor-pointer"
+            onClick={() => router.push("/front/membre")}
+          >
+            <div className="flex -space-x-3">
+              {members.slice(0, 3).map((m, i) => (
+                m.avatarUrl ? (
+                  <img
+                    key={m.id}
+                    src={m.avatarUrl}
+                    alt={`${m.firstName} ${m.lastName}`}
+                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 object-cover ${["z-30", "z-20", "z-10"][i]}`}
+                  />
+                ) : (
+                  <div
+                    key={m.id}
+                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 bg-[#C7D7F3] flex items-center justify-center ${["z-30", "z-20", "z-10"][i]}`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 19" fill="none">
+                      <path d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z" fill="#152646"/>
+                      <path d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z" fill="#152646"/>
+                    </svg>
+                  </div>
+                )
+              ))}
+            </div>
+            <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
+              {groupName ?? "..."}
+            </h1>
+          </div>
 
-      <div className="flex items-center justify-center w-[30px] h-[30px] rounded-full bg-[#E3EBF9]">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="19"
-          viewBox="0 0 16 19"
-          fill="none" onClick={(e) => { e.stopPropagation(); router.push("/front/profil") }}
-        >
-          <path
-            d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z"
-            fill="#152646"
-          />
-          <path
-            d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z"
-            fill="#152646"
-          />
-        </svg>
-      </div>
-    </div>
-  </div>
+          {/* Bouton profil — droite */}
+          <button
+            onClick={() => router.push("/front/profil")}
+            className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-[#E3EBF9] flex-shrink-0 overflow-hidden"
+          >
+            {members.find((m) => m.id === myUserId)?.avatarUrl ? (
+              <img
+                src={members.find((m) => m.id === myUserId)!.avatarUrl!}
+                alt="Mon profil"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="19" viewBox="0 0 16 19" fill="none">
+                <path d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z" fill="#152646"/>
+                <path d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z" fill="#152646"/>
+              </svg>
+            )}
+          </button>
 
-</div>
+        </div>
 
         {/* FIL D'ACTIVITÉ — px-[24px], gap-[24px] */}
         <div ref={scrollContainerRef} className="flex-1 px-[24px] py-[24px] flex flex-col gap-[24px] overflow-y-auto scrollbar-none">
@@ -555,7 +566,8 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
             </div>
 
             {/* Contenu scrollable */}
-            <div className="flex-1 overflow-y-auto px-[20px] py-[16px] flex flex-col gap-[20px]">
+            <div className="relative flex-1 min-h-0">
+            <div className="h-full overflow-y-auto px-[20px] py-[16px] flex flex-col gap-[20px]">
 
               {/* Acceptés */}
               <div className="flex flex-col gap-[10px]">
@@ -601,6 +613,9 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                 )}
               </div>
 
+            </div>
+              {/* Dégradé rose en bas */}
+              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-pink-100 to-transparent" />
             </div>
           </div>
         </div>

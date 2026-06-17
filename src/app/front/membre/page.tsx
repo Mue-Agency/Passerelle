@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { groupsService } from "@/app/services/groups.service";
 import { useAuth } from "@/app/hooks/useAuth";
 import { User, ChevronRight } from "lucide-react";
 
 export default function MembrePage() {
+    const router = useRouter();
     const { isReady } = useAuth();
     const [members, setMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl: string | null }[]>([]);
 
@@ -24,8 +26,16 @@ export default function MembrePage() {
             <main className="flex w-full max-w-md min-h-screen flex-col items-center justify-between p-6">
 
                 {/* HAUT DE PAGE */}
-                <div className="w-full text-center mb-8">
-                    <p className="text-[28px] font-['Nunito_Sans'] font-extrabold text-[#001A0E] leading-[36px] tracking-[-0.7px] dark:text-zinc-50">
+                <div className="w-full flex items-center mb-8">
+                    <button
+                        onClick={() => router.back()}
+                        className="flex items-center text-[#152646] dark:text-zinc-50"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </button>
+                    <p className="flex-1 text-center text-[28px] font-['Nunito_Sans'] font-extrabold text-[#001A0E] leading-[36px] tracking-[-0.7px] dark:text-zinc-50">
                         Groupe
                     </p>
                 </div>
@@ -37,38 +47,29 @@ export default function MembrePage() {
                         Membre du Groupe !
                     </h3>
 
-
                     <p className="text-base leading-7 text-zinc-600 dark:text-zinc-400">
                         Retrouvez les personnes qui partagent vos sorties au marché.
                     </p>
 
+                    {members.map((m) => (
+                        <button
+                            key={m.id}
+                            onClick={() => router.push(`/front/user?id=${m.id}`)}
+                            className="w-full flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800"
+                        >
+                            {m.avatarUrl ? (
+                                <img src={m.avatarUrl} alt={m.firstName} className="h-8 w-8 rounded-full object-cover" />
+                            ) : (
+                                <User className="h-5 w-5 text-zinc-500" />
+                            )}
+                            <span className="flex-1 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                {m.firstName} {m.lastName}
+                            </span>
+                            <ChevronRight className="h-4 w-4 text-zinc-400" />
+                        </button>
+                    ))}
+
                 </div>
-
-                {/* <div className="flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
-        <img
-            src={user.avatarUrl}
-            alt={`${user.firstName} ${user.lastName}`}
-            className="h-10 w-10 rounded-full object-cover"
-        />
-
-        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-            {user.firstName} {user.lastName}
-        </span>
-        </div> */}
-
-                {members.map((m) => (
-                <div key={m.id} className="flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
-                    {m.avatarUrl ? (
-                        <img src={m.avatarUrl} alt={`${m.firstName}`} className="h-8 w-8 rounded-full object-cover" />
-                    ) : (
-                        <User className="h-5 w-5 text-zinc-500" />
-                    )}
-                    <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                        {m.firstName} {m.lastName}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-zinc-400" />
-                </div>
-                ))}
 
                 {/* BAS DE PAGE */}
                 <div className="w-full mt-8">
