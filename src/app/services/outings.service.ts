@@ -18,6 +18,7 @@ type OutingOut = {
   isParticipant: boolean;
   createdBy: { id: string; firstName: string; lastName: string };
   participants: { id: string; firstName: string; lastName: string }[];
+  refusedParticipants?: { id: string; firstName: string; lastName: string }[];
 };
 
 export const outingsService = {

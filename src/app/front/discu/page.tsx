@@ -371,14 +371,22 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
       const [hasJoined, setHasJoined] = useState(msg.outing?.isParticipant ?? false);
       const [hasRefused, setHasRefused] = useState(false);
       const [participants, setParticipants] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
-      const [refusedCount, setRefusedCount] = useState(msg.outing?.participantCountrefused ?? 0);
+      const [refusedParticipants, setRefusedParticipants] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
 
       const currentUser = myUserId ? members.find((m) => m.id === myUserId) ?? null : null;
 
       useEffect(() => {
         if (!msg.outing) return;
         outingsService.getOuting(msg.outing.id).then((result) => {
-          if (result.isOk) setParticipants(result.data.participants);
+          if (!result.isOk) return;
+          setParticipants(result.data.participants);
+          setHasJoined(result.data.isParticipant);
+          if (result.data.refusedParticipants) {
+            setRefusedParticipants(result.data.refusedParticipants);
+            if (myUserId) {
+              setHasRefused(result.data.refusedParticipants.some((p) => p.id === myUserId));
+            }
+          }
         });
       }, [msg.outing?.id]);
 
@@ -393,7 +401,7 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
           setParticipants((prev) =>
             prev.some((p) => p.id === currentUser.id) ? prev : [...prev, currentUser]
           );
-          setRefusedCount((prev) => (hasRefused ? Math.max(0, prev - 1) : prev));
+          setRefusedParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
         try {
           await outingsService.joinOuting(outing.id);
@@ -417,13 +425,17 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
       async function handleRefuse() {
         setHasRefused(true);
         setHasJoined(false);
-        if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
-        setRefusedCount((prev) => prev + 1);
+        if (currentUser) {
+          setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
+          setRefusedParticipants((prev) =>
+            prev.some((p) => p.id === currentUser.id) ? prev : [...prev, currentUser]
+          );
+        }
         try {
           await outingsService.refuseOuting(outing.id);
         } catch {
           setHasRefused(false);
-          setRefusedCount((prev) => Math.max(0, prev - 1));
+          if (currentUser) setRefusedParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
       }
   
@@ -528,9 +540,12 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
             )}
 
             {hasRefused ? (
-              <div className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] text-center">
-                Vous avez refusé
-              </div>
+              <button
+                onClick={handleJoin}
+                className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
+              >
+                Vous avez refusé 
+              </button>
             ) : (
               <button
                 onClick={handleRefuse}
@@ -597,18 +612,25 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                   <div className="w-[24px] h-[24px] rounded-full bg-zinc-100 flex items-center justify-center flex-shrink-0">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#727973" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </div>
-                  <span className="text-[14px] font-semibold text-[#727973]">Refusés · {refusedCount}</span>
+                  <span className="text-[14px] font-semibold text-[#727973]">Refusés · {refusedParticipants.length}</span>
                 </div>
-                {refusedCount === 0 ? (
+                {refusedParticipants.length === 0 ? (
                   <p className="text-[13px] text-[#727973] pl-[32px]">Aucun refus pour l'instant</p>
                 ) : (
                   <div className="flex flex-col gap-[8px]">
-                    {Array.from({ length: refusedCount }).map((_, i) => (
-                      <div key={i} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-zinc-50 dark:bg-zinc-800">
-                        <div className="w-[36px] h-[36px] rounded-full bg-zinc-200 dark:bg-zinc-700 flex-shrink-0" />
-                        <span className="text-[14px] text-[#727973]">Participant anonyme</span>
-                      </div>
-                    ))}
+                    {refusedParticipants.map((p) => {
+                      const member = members.find((m) => m.id === p.id);
+                      return (
+                        <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-zinc-50 dark:bg-zinc-800">
+                          {member?.avatarUrl ? (
+                            <img src={member.avatarUrl} alt={p.firstName} className="w-[36px] h-[36px] rounded-full object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="w-[36px] h-[36px] rounded-full bg-zinc-200 dark:bg-zinc-700 flex-shrink-0" />
+                          )}
+                          <span className="text-[14px] text-[#727973]">{p.firstName} {p.lastName.charAt(0)}.</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
