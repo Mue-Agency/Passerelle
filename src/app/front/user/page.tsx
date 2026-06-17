@@ -70,7 +70,7 @@ function UserContent() {
                         {member?.avatarUrl ? (
                             <img src={member.avatarUrl} alt={member.firstName} className="h-full w-full object-cover" />
                         ) : (
-                            <User className="h-10 w-10 text-white" />
+                            <img src="/pdp.png" alt="avatar" className="h-full w-full object-cover" />
                         )}
                     </div>
                     {member && (

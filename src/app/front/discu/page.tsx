@@ -143,15 +143,12 @@ export default function DiscussionPage() {
                     className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 object-cover ${["z-30", "z-20", "z-10"][i]}`}
                   />
                 ) : (
-                  <div
+                  <img
                     key={m.id}
-                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 bg-[#C7D7F3] flex items-center justify-center ${["z-30", "z-20", "z-10"][i]}`}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 19" fill="none">
-                      <path d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z" fill="#152646"/>
-                      <path d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z" fill="#152646"/>
-                    </svg>
-                  </div>
+                    src="/pdp.png"
+                    alt={`${m.firstName} ${m.lastName}`}
+                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 object-cover ${["z-30", "z-20", "z-10"][i]}`}
+                  />
                 )
               ))}
             </div>
@@ -172,10 +169,7 @@ export default function DiscussionPage() {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="19" viewBox="0 0 16 19" fill="none">
-                <path d="M10.5 4.5C10.5 3.11929 9.38071 2 8 2C6.61929 2 5.5 3.11929 5.5 4.5C5.5 5.88071 6.61929 7 8 7V9C5.51472 9 3.5 6.98528 3.5 4.5C3.5 2.01472 5.51472 0 8 0C10.4853 0 12.5 2.01472 12.5 4.5C12.5 6.98528 10.4853 9 8 9V7C9.38071 7 10.5 5.88071 10.5 4.5Z" fill="#152646"/>
-                <path d="M8 10C12.5 10 16 14.0817 16 18.5H14C14 15.1863 11.5 12 8 12C4.5 12 2 15.1863 2 18.5H0C0 14.0817 3.5 10 8 10Z" fill="#152646"/>
-              </svg>
+              <img src="/pdp.png" alt="Mon profil" className="w-full h-full object-cover" />
             )}
           </button>
 
@@ -496,7 +490,7 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                 <img
                   key={p.id}
                   className={`w-8 h-8 rounded-full border-2 ${isMe ? "border-white/30" : "border-white"} ${i === 0 ? "" : "-ml-2"}`}
-                  src="/assets/group-placeholder.png"
+                  src="/pdp.png"
                   alt={`${p.firstName} ${p.lastName}`}
                 />
               ))}
@@ -598,7 +592,7 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                   <div className="flex flex-col gap-[8px]">
                     {participants.map((p) => (
                       <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-[#F4FAF0] dark:bg-zinc-800">
-                        <img src="/assets/group-placeholder.png" alt={`${p.firstName} ${p.lastName}`} className="w-[36px] h-[36px] rounded-full flex-shrink-0" />
+                        <img src="/pdp.png" alt={`${p.firstName} ${p.lastName}`} className="w-[36px] h-[36px] rounded-full flex-shrink-0" />
                         <span className="text-[14px] font-medium text-[#001A0E] dark:text-zinc-100">{p.firstName} {p.lastName.charAt(0)}.</span>
                       </div>
                     ))}

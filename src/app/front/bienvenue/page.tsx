@@ -85,7 +85,7 @@ export default function BienvenuePage() {
                     {members.map((m) => (
                         <div key={m.id} className="flex items-center gap-[20px] bg-white dark:bg-zinc-800 rounded-[12px] px-[20px] py-[8px]">
                             <img
-                                src={m.avatarUrl ?? "/assets/group-placeholder.png"}
+                                src={m.avatarUrl ?? "/pdp.png"}
                                 alt={`${m.firstName} ${m.lastName}`}
                                 className="w-[64px] h-[64px] rounded-full object-cover shrink-0"
                             />

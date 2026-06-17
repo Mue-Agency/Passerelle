@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { groupsService } from "@/app/services/groups.service";
 import { useAuth } from "@/app/hooks/useAuth";
-import { User, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 export default function MembrePage() {
     const router = useRouter();
@@ -60,7 +60,7 @@ export default function MembrePage() {
                             {m.avatarUrl ? (
                                 <img src={m.avatarUrl} alt={m.firstName} className="h-8 w-8 rounded-full object-cover" />
                             ) : (
-                                <User className="h-5 w-5 text-zinc-500" />
+                                <img src="/pdp.png" alt="avatar" className="h-8 w-8 rounded-full object-cover" />
                             )}
                             <span className="flex-1 text-left text-sm font-medium text-zinc-900 dark:text-zinc-100">
                                 {m.firstName} {m.lastName}
