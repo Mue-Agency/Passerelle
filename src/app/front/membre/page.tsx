@@ -2,57 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { configService } from "@/app/services/config.service";
-import { usersService } from "@/app/services/users.service";
-import { Check, User , ChevronRight} from "lucide-react";
+import { groupsService } from "@/app/services/groups.service";
+import { useAuth } from "@/app/hooks/useAuth";
+import { User, ChevronRight } from "lucide-react";
 
 export default function MembrePage() {
     const router = useRouter();
-    const [prenom, setPrenom] = useState("");
-    const [nom, setNom] = useState("");
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [groupId, setGroupId] = useState<string | null>(null);
+    const { isReady } = useAuth();
+    const [members, setMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl: string | null }[]>([]);
 
     useEffect(() => {
-        configService.getConfig().then((result) => {
-            if (result.isOk) setGroupId(result.data.groupId);
-            else setError("Impossible de récupérer le groupe.");
+        const gId = localStorage.getItem("groupId");
+        if (!gId) return;
+        groupsService.getGroupMembers(gId).then((result) => {
+            if (result.isOk) setMembers(result.data.members);
         });
     }, []);
 
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setError("");
-
-        if (!prenom.trim() || !nom.trim()) {
-            setError("Veuillez remplir les deux champs.");
-            return;
-        }
-
-        if (!groupId) {
-            setError("Impossible de récupérer le groupe.");
-            return;
-        }
-
-        setIsLoading(true);
-        const result = await usersService.createProfile({
-            firstName: prenom.trim(),
-            lastName: nom.trim(),
-            groupId,
-        });
-        setIsLoading(false);
-
-        if (!result.isOk) {
-            setError(result.error);
-            return;
-        }
-
-        localStorage.setItem("userId", result.data.userId);
-        router.push("/front/discu");
-    }
-
+    if (!isReady) return null;
 
     return (
         <div className="flex flex-col min-h-screen items-center justify-center bg-[#FAF9F5] font-sans dark:bg-black">
@@ -91,13 +58,15 @@ export default function MembrePage() {
         </span>
         </div> */}
 
-                <div className="flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
+                {members.map((m) => (
+                <div key={m.id} className="flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
                     <User className="h-5 w-5 text-zinc-500" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-            Jean Dupont
+            {m.firstName} {m.lastName}
             </span>
                     <ChevronRight className="h-4 w-4 text-zinc-400" />
                 </div>
+                ))}
 
                 {/* BAS DE PAGE */}
                 <div className="w-full flex flex-col gap-4 mt-8">

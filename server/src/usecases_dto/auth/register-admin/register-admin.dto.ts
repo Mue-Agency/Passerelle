@@ -10,9 +10,10 @@ export const RegisterAdminDtoIn = z.object({
 export type RegisterAdminDtoIn = z.output<typeof RegisterAdminDtoIn>;
 
 export const RegisterAdminDtoOut = z.object({
-  userId:   z.string(),
-  username: z.string(),
-  role:     z.string(),
+  userId:    z.string(),
+  username:  z.string(),
+  firstName: z.string(),
+  role:      z.enum(["CITOYEN", "ADMIN"]),
 });
 
 export type RegisterAdminDtoOut = z.output<typeof RegisterAdminDtoOut>;

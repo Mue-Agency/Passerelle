@@ -3,24 +3,23 @@ import { prisma } from "../../../lib/prisma";
 import type { LoginDtoIn, LoginDtoOut } from "./login.dto";
 
 export async function login(dto: LoginDtoIn): Promise<LoginDtoOut> {
-  const users = await prisma.user.findMany({
+  const user = await prisma.user.findFirst({
     where: { firstName: dto.firstName },
   });
 
-  if (users.length === 0) {
+  if (!user) {
     throw new Error("INVALID_CREDENTIALS");
   }
 
-  for (const user of users) {
-    const match = await compare(dto.password, user.passwordHash);
-    if (match) {
-      return {
-        userId: user.id,
-        username: user.username,
-        role: user.role,
-      };
-    }
+  const match = await compare(dto.password, user.passwordHash);
+  if (!match) {
+    throw new Error("INVALID_CREDENTIALS");
   }
 
-  throw new Error("INVALID_CREDENTIALS");
+  return {
+    userId: user.id,
+    username: user.username,
+    firstName: user.firstName,
+    role: user.role,
+  };
 }

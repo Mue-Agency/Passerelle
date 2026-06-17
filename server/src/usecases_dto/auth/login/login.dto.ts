@@ -8,9 +8,10 @@ export const LoginDtoIn = z.object({
 export type LoginDtoIn = z.output<typeof LoginDtoIn>;
 
 export const LoginDtoOut = z.object({
-  userId:   z.string(),
-  username: z.string(),
-  role:     z.string(),
+  userId:    z.string(),
+  username:  z.string(),
+  firstName: z.string(),
+  role:      z.enum(["CITOYEN", "ADMIN"]),
 });
 
 export type LoginDtoOut = z.output<typeof LoginDtoOut>;

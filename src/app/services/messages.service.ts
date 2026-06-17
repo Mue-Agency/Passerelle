@@ -1,4 +1,4 @@
-import { apiUrl, authHeaders, handleResponse } from "./_http";
+import { request } from "./_http";
 
 type MessageOut = {
   id: string;
@@ -13,6 +13,7 @@ type MessageOut = {
     location: string;
     maxSpots: number;
     participantCount: number;
+    participantCountrefused: number;
     isParticipant: boolean;
   } | null;
 };
@@ -20,19 +21,15 @@ type MessageOut = {
 export type { MessageOut };
 
 export const messagesService = {
-  async getMessages(groupId: string) {
-    const res = await fetch(apiUrl(`/api/messages/${groupId}`), {
-      headers: authHeaders(),
-    });
-    return handleResponse<MessageOut[]>(res);
+  getMessages(groupId: string) {
+    return request<MessageOut[]>(`/api/messages/${groupId}`);
   },
 
-  async sendMessage(groupId: string, content: string) {
-    const res = await fetch(apiUrl(`/api/messages/${groupId}`), {
+  sendMessage(groupId: string, content: string) {
+    return request<MessageOut>(`/api/messages/${groupId}`, {
       method: "POST",
-      headers: authHeaders({ "Content-Type": "application/json" }),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content }),
     });
-    return handleResponse<MessageOut>(res);
   },
 };

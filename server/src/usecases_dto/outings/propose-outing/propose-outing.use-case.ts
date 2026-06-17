@@ -7,7 +7,7 @@ export async function proposeOuting(dto: ProposeOutingDtoIn): Promise<ProposeOut
   });
   if (!member) throw new Error("NOT_MEMBER");
 
-  const [outing, user] = await prisma.$transaction(async (tx) => {
+  const [outing, message, user] = await prisma.$transaction(async (tx) => {
     const hasPoll = Array.isArray(dto.pollOptions) && dto.pollOptions.length > 0;
 
     const outing = await tx.outing.create({
@@ -32,7 +32,7 @@ export async function proposeOuting(dto: ProposeOutingDtoIn): Promise<ProposeOut
       });
     }
 
-    await tx.message.create({
+    const message = await tx.message.create({
       data: {
         groupId: dto.groupId,
         userId: dto.userId,
@@ -46,14 +46,14 @@ export async function proposeOuting(dto: ProposeOutingDtoIn): Promise<ProposeOut
       select: { id: true, firstName: true, lastName: true },
     });
 
-    return [outing, user] as const;
+    return [outing, message, user] as const;
   });
 
   return {
-    id: outing.id,
+    id: message.id,
     type: "OUTING",
     content: null,
-    sentAt: new Date(),
+    sentAt: message.sentAt,
     user,
     outing: {
       id: outing.id,
@@ -62,6 +62,7 @@ export async function proposeOuting(dto: ProposeOutingDtoIn): Promise<ProposeOut
       location: outing.location,
       maxSpots: outing.maxSpots,
       participantCount: 0,
+      participantCountrefused: 0,
       isParticipant: false,
     },
   };

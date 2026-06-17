@@ -12,7 +12,7 @@ export type RegisterDtoIn = z.output<typeof RegisterDtoIn>;
 export const RegisterDtoOut = z.object({
   userId:   z.string(),
   username: z.string(),
-  role:     z.string(),
+  role:     z.enum(["CITOYEN", "ADMIN"]),
   groupId:  z.string().optional(),
 });
 

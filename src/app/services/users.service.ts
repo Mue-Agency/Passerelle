@@ -1,24 +1,29 @@
-import { apiUrl, handleResponse } from "./_http";
+import { request } from "./_http";
 
-type CreateProfileInput = {
+type UserProfile = {
+  id: string;
   firstName: string;
   lastName: string;
-  groupId: string;
+  avatarUrl: string | null;
+  interests: string[];
 };
 
-type CreateProfileResult = {
-  userId: string;
-  groupId: string;
-  token: string;
+type UpdateProfileInput = {
+  firstName?: string;
+  lastName?: string;
+  interests?: string[];
 };
 
 export const usersService = {
-  async createProfile(input: CreateProfileInput) {
-    const res = await fetch(apiUrl("/api/users"), {
-      method: "POST",
+  getMe() {
+    return request<{ exists: boolean; user: UserProfile }>("/api/users/me");
+  },
+
+  updateProfile(input: UpdateProfileInput) {
+    return request<UserProfile>("/api/users/me", {
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<CreateProfileResult>(res);
   },
 };

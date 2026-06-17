@@ -6,9 +6,9 @@ let socket: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socket) {
-    const token = localStorage.getItem("token") || "";
+    // Le cookie de session httpOnly est envoyé automatiquement via withCredentials.
     socket = io(process.env.NEXT_PUBLIC_API_URL!, {
-      auth: { token },
+      withCredentials: true,
       autoConnect: false,
     });
   }

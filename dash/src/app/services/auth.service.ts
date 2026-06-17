@@ -1,4 +1,4 @@
-import { apiUrl, handleResponse } from "./_http";
+import { request, type Result } from "./_http";
 
 type LoginInput = {
   firstName: string;
@@ -15,26 +15,24 @@ type RegisterAdminInput = {
 type AuthResult = {
   userId: string;
   username: string;
-  role: string;
-  token: string;
+  firstName: string;
+  role: "CITOYEN" | "ADMIN";
 };
 
 export const authService = {
-  async login(input: LoginInput) {
-    const res = await fetch(apiUrl("/api/auth/login"), {
+  login(input: LoginInput): Promise<Result<AuthResult>> {
+    return request<AuthResult>("/api/auth/login?app=dash", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<AuthResult>(res);
   },
 
-  async registerAdmin(input: RegisterAdminInput) {
-    const res = await fetch(apiUrl("/api/auth/register-admin"), {
+  registerAdmin(input: RegisterAdminInput): Promise<Result<AuthResult>> {
+    return request<AuthResult>("/api/auth/register-admin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<AuthResult>(res);
   },
 };

@@ -32,9 +32,10 @@ export default function ConnexionPage() {
       return;
     }
 
+    // Le cookie de session httpOnly est posé par le serveur (via credentials:include).
+    // On garde userId/groupId en localStorage (non secrets) pour les autres pages.
     localStorage.setItem("userId", result.data.userId);
-    localStorage.setItem("token", result.data.token);
-    document.cookie = `userId=${result.data.userId}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+    if (result.data.groupId) localStorage.setItem("groupId", result.data.groupId);
     router.push("/front/discu");
   }
 

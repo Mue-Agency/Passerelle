@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { verifyToken } from "./auth";
+import { SESSION_COOKIE } from "./cookies";
 import { prisma } from "./prisma";
 
 declare global {
@@ -11,13 +12,18 @@ declare global {
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  // Source principale : cookie httpOnly. Fallback Bearer transitoire (rollout) — à retirer ensuite.
+  const cookieToken = req.cookies?.[SESSION_COOKIE] as string | undefined;
   const header = req.headers.authorization;
-  if (!header?.startsWith("Bearer ")) {
+  const bearerToken = header?.startsWith("Bearer ") ? header.slice(7) : undefined;
+  const token = cookieToken ?? bearerToken;
+
+  if (!token) {
     res.status(401).json({ error: "Non authentifié." });
     return;
   }
 
-  const userId = verifyToken(header.slice(7));
+  const userId = verifyToken(token);
   if (!userId) {
     res.status(401).json({ error: "Token invalide." });
     return;

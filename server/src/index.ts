@@ -4,7 +4,9 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { parse as parseCookie } from "cookie";
 import { verifyToken } from "./lib/auth";
+import { SESSION_COOKIE } from "./lib/cookies";
 import { prisma } from "./lib/prisma";
 import { configRouter } from "./routes/config";
 import { authRouter } from "./routes/auth";
@@ -12,6 +14,7 @@ import { usersRouter } from "./routes/users";
 import { groupsRouter } from "./routes/groups";
 import { messagesRouter } from "./routes/messages";
 import { outingsRouter } from "./routes/outings";
+import { errorMapper } from "./lib/errorMapper";
 
 const app = express();
 const httpServer = createServer(app);
@@ -48,8 +51,14 @@ app.use("/api/groups", groupsRouter);
 app.use("/api/messages", messagesRouter);
 app.use("/api/outings", outingsRouter);
 
+app.use(errorMapper);
+
 io.use((socket, next) => {
-  const token = socket.handshake.auth.token as string | undefined;
+  // Source principale : cookie httpOnly du handshake. Fallback auth.token transitoire (rollout).
+  const cookies = parseCookie(socket.handshake.headers.cookie ?? "");
+  const cookieToken = cookies[SESSION_COOKIE];
+  const authToken = socket.handshake.auth.token as string | undefined;
+  const token = cookieToken ?? authToken;
   if (!token) return next(new Error("Non authentifié."));
 
   const userId = verifyToken(token);
@@ -61,18 +70,23 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
   socket.on("join-group", async (groupId: string) => {
-    const userId = socket.data.userId as string;
+    try {
+      const userId = socket.data.userId as string;
 
-    const member = await prisma.groupMember.findUnique({
-      where: { userId_groupId: { userId, groupId } },
-    });
+      const member = await prisma.groupMember.findUnique({
+        where: { userId_groupId: { userId, groupId } },
+      });
 
-    if (!member) {
-      socket.emit("error", "Vous n'êtes pas membre de ce groupe.");
-      return;
+      if (!member) {
+        socket.emit("error", "Vous n'êtes pas membre de ce groupe.");
+        return;
+      }
+
+      socket.join(`group:${groupId}`);
+    } catch (err) {
+      console.error("[socket:join-group]", err);
+      socket.emit("error", "Erreur serveur.");
     }
-
-    socket.join(`group:${groupId}`);
   });
 
   socket.on("leave-group", (groupId: string) => {

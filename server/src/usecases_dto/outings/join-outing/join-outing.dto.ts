@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OutingActionResult } from "../outing-action-result.schema";
 
 export const JoinOutingDtoIn = z.object({
   outingId: z.string().min(1),
@@ -7,16 +8,6 @@ export const JoinOutingDtoIn = z.object({
 
 export type JoinOutingDtoIn = z.output<typeof JoinOutingDtoIn>;
 
-export const JoinOutingDtoOut = z.object({
-  participantCount: z.number(),
-  groupId:          z.string(),
-  outing: z.object({
-    id:       z.string(),
-    title:    z.string(),
-    date:     z.date(),
-    location: z.string(),
-    maxSpots: z.number(),
-  }),
-});
+export const JoinOutingDtoOut = OutingActionResult;
 
 export type JoinOutingDtoOut = z.output<typeof JoinOutingDtoOut>;

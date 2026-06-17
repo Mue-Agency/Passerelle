@@ -39,7 +39,7 @@ model Group {
   baseGroupId   String?
   createdAt     DateTime @default(now())
 
-  baseGroup Group?  @relation("GroupSessions", fields: [baseGroupId], references: [id])
+  baseGroup Group?  @relation("GroupSessions", fields: [baseGroupId], references: [id], onDelete: Cascade)
   sessions  Group[] @relation("GroupSessions")
 
   members  GroupMember[]
@@ -53,8 +53,8 @@ model GroupMember {
   groupId  String
   joinedAt DateTime @default(now())
 
-  user  User  @relation(fields: [userId], references: [id])
-  group Group @relation(fields: [groupId], references: [id])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
   @@unique([userId, groupId])
 }
@@ -68,9 +68,9 @@ model Message {
   outingId String?
   sentAt   DateTime    @default(now())
 
-  group  Group   @relation(fields: [groupId], references: [id])
-  user   User    @relation(fields: [userId], references: [id])
-  outing Outing? @relation(fields: [outingId], references: [id])
+  group  Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outing Outing? @relation(fields: [outingId], references: [id], onDelete: Cascade)
 }
 
 enum MessageType {
@@ -96,8 +96,8 @@ model Outing {
   hasPoll      Boolean  @default(false)
   createdAt    DateTime @default(now())
 
-  group        Group              @relation(fields: [groupId], references: [id])
-  user         User               @relation(fields: [userId], references: [id])
+  group        Group              @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   participants OutingParticipant[]
   pollOptions  OutingPollOption[]
   messages     Message[]
@@ -110,8 +110,8 @@ model OutingParticipant {
   status   ParticipationStatus
   joinedAt DateTime            @default(now())
 
-  outing Outing @relation(fields: [outingId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
+  outing Outing @relation(fields: [outingId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([outingId, userId])
 }
@@ -121,7 +121,7 @@ model OutingPollOption {
   outingId String
   dateTime DateTime
 
-  outing Outing           @relation(fields: [outingId], references: [id])
+  outing Outing           @relation(fields: [outingId], references: [id], onDelete: Cascade)
   votes  OutingPollVote[]
 }
 
@@ -130,8 +130,8 @@ model OutingPollVote {
   optionId String
   userId   String
 
-  option OutingPollOption @relation(fields: [optionId], references: [id])
-  user   User             @relation(fields: [userId], references: [id])
+  option OutingPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([optionId, userId])
 }

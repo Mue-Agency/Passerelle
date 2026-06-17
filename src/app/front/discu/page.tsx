@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { configService } from "@/app/services/config.service";
 import { groupsService } from "@/app/services/groups.service";
 import { messagesService } from "@/app/services/messages.service";
 import { useMessages } from "@/app/hooks/useMessages";
+import { useAuth } from "@/app/hooks/useAuth";
 import { outingsService } from "@/app/services/outings.service";
 import type { MessageOut } from "@/app/hooks/useMessages";
 
@@ -31,6 +31,7 @@ function AuthorName(user: MessageOut["user"]): string {
 
 export default function DiscussionPage() {
   const router = useRouter();
+  const { isReady } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
@@ -39,6 +40,7 @@ export default function DiscussionPage() {
   const [groupId, setGroupId] = useState<string | null>(null);
   const [groupName, setGroupName] = useState<string | null>(null);
   const [myUserId, setMyUserId] = useState<string | null>(null);
+  const [members, setMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl: string | null }[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sendError, setSendError] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
@@ -53,12 +55,16 @@ export default function DiscussionPage() {
   useEffect(() => {
     setMyUserId(localStorage.getItem("userId"));
 
-    configService.getConfig().then(async (configResult) => {
-      if (!configResult.isOk) return;
-      setGroupId(configResult.data.groupId);
+    const storedGroupId = localStorage.getItem("groupId");
+    if (!storedGroupId) return;
+    setGroupId(storedGroupId);
 
-      const groupResult = await groupsService.getGroup(configResult.data.groupId);
-      if (groupResult.isOk) setGroupName(groupResult.data.name);
+    groupsService.getGroup(storedGroupId).then((result) => {
+      if (result.isOk) setGroupName(result.data.name);
+    });
+
+    groupsService.getGroupMembers(storedGroupId).then((result) => {
+      if (result.isOk) setMembers(result.data.members);
     });
   }, []);
 
@@ -109,6 +115,8 @@ export default function DiscussionPage() {
     }
   }
 
+  if (!isReady) return null;
+
   return (
     // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans dark:bg-black overflow-hidden">
       <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5] dark:bg-black">
@@ -123,22 +131,14 @@ export default function DiscussionPage() {
   >
     {/* Avatars superposés */}
     <div className="flex -space-x-3">
-      <img
-        src="/assets/group-placeholder.png"
-        alt="Profil 1"
-        className="relative z-30 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
-      />
-
-      <img
-        src="/assets/group-placeholder.png"
-        alt="Profil 2"
-        className="relative z-20 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
-      />
-      <img
-        src="/assets/group-placeholder.png"
-        alt="Profil 3"
-        className="relative z-10 w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900"
-      />
+      {members.slice(0, 3).map((m, i) => (
+        <img
+          key={m.id}
+          src={m.avatarUrl ?? "/assets/group-placeholder.png"}
+          alt={`${m.firstName} ${m.lastName}`}
+          className={`relative w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 ${["z-30", "z-20", "z-10"][i]}`}
+        />
+      ))}
     </div>
 
     {/* Nom + icône */}
@@ -356,14 +356,21 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
     function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       const router = useRouter();
       const [isActing, setIsActing] = useState(false);
+      const [showParticipants, setShowParticipants] = useState(false);
+      const [hasJoined, setHasJoined] = useState(msg.outing?.isParticipant ?? false);
+      const [hasRefused, setHasRefused] = useState(false);
+      const [participants, setParticipants] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+
+      useEffect(() => {
+        if (!msg.outing) return;
+        outingsService.getOuting(msg.outing.id).then((result) => {
+          if (result.isOk) setParticipants(result.data.participants);
+        });
+      }, [msg.outing?.id]);
 
       if (!msg.outing) return null;
       const { outing } = msg;
       const spotsLeft = outing.maxSpots - outing.participantCount;
-
-      const [showParticipants, setShowParticipants] = useState(false);
-      const [hasJoined, setHasJoined] = useState(false);
-      const [hasRefused, setHasRefused] = useState(false);
 
       async function handleJoin() {
         setHasJoined(true);
@@ -390,6 +397,11 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
         setHasRefused(true);
         setHasJoined(false);
 
+        try {
+          await outingsService.refuseOuting(outing.id);
+        } catch (e) {
+          setHasRefused(false);
+        }
       }
   
 
@@ -440,9 +452,14 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
             /> */}
            </div>
           <div className="flex items-center">
-            <img className="w-8 h-8 rounded-full -ml-2 first:ml-0 border border-white" src="/assets/group-placeholder.png" />
-            <img className="w-8 h-8 rounded-full -ml-2 border border-white" src="/assets/group-placeholder.png" />
-            <img className="w-8 h-8 rounded-full -ml-2 border border-white" src="/assets/group-placeholder.png" />
+            {participants.map((p, i) => (
+              <img
+                key={p.id}
+                className={`w-8 h-8 rounded-full border border-white ${i === 0 ? "" : "-ml-2"}`}
+                src="/assets/group-placeholder.png"
+                alt={`${p.firstName} ${p.lastName}`}
+              />
+            ))}
           </div>
         </div>
 
@@ -513,23 +530,23 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
             </h3>
 
             <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
-              Acceptés :  {outing.participantCount}
+              Acceptés :  {participants.length}
             </h5>
 
             <div className="flex flex-col gap-[12px] overflow-y-auto">
-              {Array.from({ length: outing.participantCount }).map((_, index) => (
+              {participants.map((p) => (
                 <div
-                  key={index}
+                  key={p.id}
                   className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
                 >
                   <img
                     src="/assets/group-placeholder.png"
-                    alt="Photo de profil"
+                    alt={`${p.firstName} ${p.lastName}`}
                     className="w-8 h-8 rounded-full"
                   />
 
                   <span>
-                    {AuthorName(msg.user)}
+                    {p.firstName} {p.lastName.charAt(0)}.
                   </span>
                 </div>
               ))}

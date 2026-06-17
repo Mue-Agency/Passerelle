@@ -1,4 +1,4 @@
-import { apiUrl, authHeaders, handleResponse } from "./_http";
+import { request } from "./_http";
 
 type ProposeOutingInput = {
   title: string;
@@ -21,44 +21,41 @@ type OutingOut = {
 };
 
 export const outingsService = {
-  async proposeOuting(groupId: string, input: ProposeOutingInput) {
-    const res = await fetch(apiUrl(`/api/outings/${groupId}/propose`), {
+  proposeOuting(groupId: string, input: ProposeOutingInput) {
+    return request<Record<string, unknown>>(`/api/outings/${groupId}/propose`, {
       method: "POST",
-      headers: authHeaders({ "Content-Type": "application/json" }),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<Record<string, unknown>>(res);
   },
 
-  async getOuting(outingId: string) {
-    const res = await fetch(apiUrl(`/api/outings/${outingId}`), {
-      headers: authHeaders(),
-    });
-    return handleResponse<OutingOut>(res);
+  getOuting(outingId: string) {
+    return request<OutingOut>(`/api/outings/${outingId}`);
   },
 
-  async joinOuting(outingId: string) {
-    const res = await fetch(apiUrl(`/api/outings/${outingId}/join`), {
+  joinOuting(outingId: string) {
+    return request<{ participantCount: number }>(`/api/outings/${outingId}/join`, {
       method: "POST",
-      headers: authHeaders(),
     });
-    return handleResponse<{ participantCount: number }>(res);
   },
 
-  async leaveOuting(outingId: string) {
-    const res = await fetch(apiUrl(`/api/outings/${outingId}/join`), {
+  leaveOuting(outingId: string) {
+    return request<{ participantCount: number }>(`/api/outings/${outingId}/join`, {
       method: "DELETE",
-      headers: authHeaders(),
     });
-    return handleResponse<{ participantCount: number }>(res);
   },
 
-  async updateOuting(outingId: string, input: ProposeOutingInput) {
-    const res = await fetch(apiUrl(`/api/outings/${outingId}`), {
+  refuseOuting(outingId: string) {
+    return request<{ acceptedCount: number; refusedCount: number }>(`/api/outings/${outingId}/refuse`, {
+      method: "POST",
+    });
+  },
+
+  updateOuting(outingId: string, input: ProposeOutingInput) {
+    return request<Record<string, unknown>>(`/api/outings/${outingId}`, {
       method: "PATCH",
-      headers: authHeaders({ "Content-Type": "application/json" }),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<Record<string, unknown>>(res);
   },
 };

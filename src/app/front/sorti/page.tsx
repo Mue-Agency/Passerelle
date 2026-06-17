@@ -2,8 +2,8 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { configService } from "@/app/services/config.service";
 import { groupsService } from "@/app/services/groups.service";
+import { useAuth } from "@/app/hooks/useAuth";
 import { outingsService } from "@/app/services/outings.service";
 
 function getNextSuggestionDate(): string {
@@ -32,6 +32,7 @@ export default function SortiePage() {
 
 function SortieContent() {
   const router = useRouter();
+  const { isReady } = useAuth();
   const searchParams = useSearchParams();
   const outingId = searchParams.get("outingId");
 
@@ -51,13 +52,14 @@ function SortieContent() {
   const suggestionDate = getNextSuggestionDate();
 
   useEffect(() => {
-    configService.getConfig().then(async (configResult) => {
-      if (!configResult.isOk) return;
-      setGroupId(configResult.data.groupId);
-      setLieu(configResult.data.lieu);
+    const storedGroupId = localStorage.getItem("groupId");
+    if (!storedGroupId) return;
+    setGroupId(storedGroupId);
 
-      const groupResult = await groupsService.getGroup(configResult.data.groupId);
-      if (groupResult.isOk) setGroupName(groupResult.data.name);
+    groupsService.getGroup(storedGroupId).then((result) => {
+      if (!result.isOk) return;
+      setGroupName(result.data.name);
+      setLieu(result.data.lieu);
     });
   }, []);
 
@@ -132,6 +134,8 @@ function SortieContent() {
   const truncatedName = groupName
     ? groupName.length > 30 ? groupName.slice(0, 30) + "..." : groupName
     : "...";
+
+  if (!isReady) return null;
 
   return (
     <div className="w-full min-h-screen flex justify-center bg-[#FAF9F5] font-sans dark:bg-black">

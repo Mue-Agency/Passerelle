@@ -2,61 +2,43 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { configService } from "@/app/services/config.service";
-import { usersService } from "@/app/services/users.service";
-import { Check, User , ChevronRight} from "lucide-react";
+import { groupsService } from "@/app/services/groups.service";
+import { useAuth } from "@/app/hooks/useAuth";
+import { ChevronRight } from "lucide-react";
+
+type Member = { id: string; firstName: string; lastName: string; avatarUrl: string | null };
 
 export default function BienvenuePage() {
     const router = useRouter();
-    const [prenom, setPrenom] = useState("");
-    const [nom, setNom] = useState("");
+    const { isReady } = useAuth();
     const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
     const [groupId, setGroupId] = useState<string | null>(null);
-    const [user, setUser] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
-    
+    const [groupName, setGroupName] = useState("");
+    const [members, setMembers] = useState<Member[]>([]);
 
     useEffect(() => {
-        configService.getConfig().then((result) => {
-            if (result.isOk) setGroupId(result.data.groupId);
-            else setError("Impossible de récupérer le groupe.");
+        if (localStorage.getItem("hasSeenWelcome")) {
+            router.replace("/front/discu");
+            return;
+        }
+
+        const storedGroupId = localStorage.getItem("groupId");
+        if (!storedGroupId) {
+            setError("Aucun groupe trouvé.");
+            return;
+        }
+        setGroupId(storedGroupId);
+
+        groupsService.getGroup(storedGroupId).then((result) => {
+            if (result.isOk) setGroupName(result.data.name);
+        });
+
+        groupsService.getGroupMembers(storedGroupId).then((result) => {
+            if (result.isOk) setMembers(result.data.members);
         });
     }, []);
 
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setError("");
-
-        if (!prenom.trim() || !nom.trim()) {
-            setError("Veuillez remplir les deux champs.");
-            return;
-        }
-
-        if (!groupId) {
-            setError("Impossible de récupérer le groupe.");
-            return;
-        }
-
-        setIsLoading(true);
-        const result = await usersService.createProfile({
-            firstName: prenom.trim(),
-            lastName: nom.trim(),
-            groupId,
-        });
-        setIsLoading(false);
-
-        if (!result.isOk) {
-            setError(result.error);
-            return;
-        }
-
-        localStorage.setItem("userId", result.data.userId);
-        // router.push("/front/discu");
-        router.push("/front/discu");
-router.refresh();
-    }
-
+    if (!isReady) return null;
 
     return (
         <div className="flex flex-col min-h-screen items-center justify-center bg-[#FAF9F5] font-sans dark:bg-black">
@@ -88,7 +70,7 @@ router.refresh();
                     </h1>
 
                     <p className="text-base leading-7 text-zinc-600 dark:text-zinc-400">
-                        Vous faites maintenant partie du groupe du Marché des Enfants Rouges. Vous pouvez discuter et proposer une sortie ensemble.
+                        Vous faites maintenant partie du groupe {groupName ? `« ${groupName} »` : ""}. Vous pouvez discuter et proposer une sortie ensemble.
                     </p>
 
                 </div>
@@ -99,32 +81,33 @@ router.refresh();
                     </h2>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
-                    {/* <img
-                        src={user.avatarUrl}
-                        alt={`${user.firstName} ${user.lastName}`}
-                        className="h-10 w-10 rounded-full object-cover"
-                    /> */}
-
-                    {/* <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                        {user.firstName} {user.lastName}
-                    </span> */}
-                    <ChevronRight className="h-4 w-4 text-zinc-400" />
+                <div className="flex flex-col gap-[16px] w-full">
+                    {members.map((m) => (
+                        <div key={m.id} className="flex items-center gap-[20px] bg-white dark:bg-zinc-800 rounded-[12px] px-[20px] py-[8px]">
+                            <img
+                                src={m.avatarUrl ?? "/assets/group-placeholder.png"}
+                                alt={`${m.firstName} ${m.lastName}`}
+                                className="w-[64px] h-[64px] rounded-full object-cover shrink-0"
+                            />
+                            <span className="text-[20px] font-semibold text-[#1a1c1b] dark:text-zinc-100 flex-1">
+                                {m.firstName} {m.lastName}
+                            </span>
+                            <ChevronRight className="h-[12px] w-[7.4px] text-zinc-400 shrink-0" />
+                        </div>
+                    ))}
                 </div>
 
 
                 {/* BAS DE PAGE */}
                 <div className="w-full flex flex-col gap-4 mt-8">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full">
-                        <button
-                            type="button"
-                            onClick={() => router.push("/front/discu")}
-                            disabled={isLoading || !groupId}
-                            className="w-full rounded-lg bg-[#152646] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
-                        >
-                            Voir le Chat
-                        </button>
-                    </form>
+                    <button
+                        type="button"
+                        onClick={() => { localStorage.setItem("hasSeenWelcome", "true"); router.push("/front/discu"); }}
+                        disabled={!groupId}
+                        className="w-full rounded-lg bg-[#152646] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+                    >
+                        Voir le Chat
+                    </button>
                     <p className="text-xs text-zinc-400 dark:text-zinc-500 text-center">
                         Groupe modéré pour garantir la sécurité de tous.
                     </p>
