@@ -5,6 +5,16 @@ type MemberOut = { id: string; firstName: string; lastName: string; avatarUrl: s
 
 type GroupMembersOut = { members: MemberOut[] };
 
+export type OutingItem = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  isParticipant: boolean;
+};
+
+type GroupOutingsOut = { outings: OutingItem[] };
+
 export const groupsService = {
   getGroup(groupId: string) {
     return request<GroupOut>(`/api/groups/${groupId}`);
@@ -12,5 +22,9 @@ export const groupsService = {
 
   getGroupMembers(groupId: string) {
     return request<GroupMembersOut>(`/api/groups/${groupId}/members`);
+  },
+
+  getGroupOutings(groupId: string) {
+    return request<GroupOutingsOut>(`/api/groups/${groupId}/outings`);
   },
 };

@@ -6,6 +6,7 @@ type UserProfile = {
   lastName: string;
   avatarUrl: string | null;
   interests: string[];
+  createdAt?: string;
 };
 
 type UpdateProfileInput = {
@@ -24,6 +25,15 @@ export const usersService = {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
+    });
+  },
+
+  uploadAvatar(file: File) {
+    const form = new FormData();
+    form.append("avatar", file);
+    return request<UserProfile>("/api/users/me/avatar", {
+      method: "POST",
+      body: form,
     });
   },
 };

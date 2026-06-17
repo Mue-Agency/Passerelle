@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { groupsService } from "@/app/services/groups.service";
 import { useAuth } from "@/app/hooks/useAuth";
 import { User, ChevronRight } from "lucide-react";
 
 export default function MembrePage() {
-    const router = useRouter();
     const { isReady } = useAuth();
     const [members, setMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl: string | null }[]>([]);
 
@@ -60,10 +58,14 @@ export default function MembrePage() {
 
                 {members.map((m) => (
                 <div key={m.id} className="flex items-center gap-3 rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
-                    <User className="h-5 w-5 text-zinc-500" />
+                    {m.avatarUrl ? (
+                        <img src={m.avatarUrl} alt={`${m.firstName}`} className="h-8 w-8 rounded-full object-cover" />
+                    ) : (
+                        <User className="h-5 w-5 text-zinc-500" />
+                    )}
                     <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-            {m.firstName} {m.lastName}
-            </span>
+                        {m.firstName} {m.lastName}
+                    </span>
                     <ChevronRight className="h-4 w-4 text-zinc-400" />
                 </div>
                 ))}
