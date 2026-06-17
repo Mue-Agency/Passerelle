@@ -212,7 +212,7 @@ export default function DiscussionPage() {
           ) : (
             <div className="flex flex-col gap-[16px]">
               {messages.map((msg) => (
-                <MessageItem key={msg.id} msg={msg} isMe={msg.user.id === myUserId} />
+                <MessageItem key={msg.id} msg={msg} isMe={msg.user.id === myUserId} myUserId={myUserId} members={members} />
               ))}
             </div>
           )}
@@ -279,7 +279,7 @@ export default function DiscussionPage() {
 
 /* ─── MessageItem ─── */
 
-function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: boolean; myUserId: string | null; members: { id: string; firstName: string; lastName: string; avatarUrl: string | null }[] }) {
   if (msg.type === "JOIN") {
     return (
       <div className="text-center text-[14px] text-[#424843] dark:text-zinc-400 leading-normal">
@@ -289,7 +289,7 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
   }
 
   if (msg.type === "OUTING" && msg.outing) {
-    return <OutingCard msg={msg} isMe={isMe} />;
+    return <OutingCard msg={msg} isMe={isMe} myUserId={myUserId} members={members} />;
   }
 
   return (
@@ -302,7 +302,7 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       <div className={`max-w-[286px] rounded-[12px] p-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex gap-[8px] items-end ${
         isMe
           ? "bg-[#152546] text-white rounded-tl-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tr-none"
-          : "bg-white dark:bg-zinc-900 text-[#E3EBF9] dark:text-zinc-50 rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
+          : "bg-[#E3EBF9] dark:bg-zinc-900 text-[#FFFFF] dark:text-zinc-50 rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
       }`}>
         <p className="break-words leading-normal text-[16px] flex-1 min-w-0">{msg.content}</p>
         <span className={`text-[12px] leading-[18px] whitespace-nowrap flex-shrink-0 ${isMe ? "text-white/70" : "text-[#727973]"}`}>
@@ -353,13 +353,16 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
     }
 
 /* ─── OutingCard ─── */
-    function OutingCard({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
+    function OutingCard({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: boolean; myUserId: string | null; members: { id: string; firstName: string; lastName: string; avatarUrl: string | null }[] }) {
       const router = useRouter();
       const [isActing, setIsActing] = useState(false);
       const [showParticipants, setShowParticipants] = useState(false);
       const [hasJoined, setHasJoined] = useState(msg.outing?.isParticipant ?? false);
       const [hasRefused, setHasRefused] = useState(false);
       const [participants, setParticipants] = useState<{ id: string; firstName: string; lastName: string }[]>([]);
+      const [refusedCount, setRefusedCount] = useState(msg.outing?.participantCountrefused ?? 0);
+
+      const currentUser = myUserId ? members.find((m) => m.id === myUserId) ?? null : null;
 
       useEffect(() => {
         if (!msg.outing) return;
@@ -375,32 +378,41 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       async function handleJoin() {
         setHasJoined(true);
         setHasRefused(false);
-
+        if (currentUser) {
+          setParticipants((prev) =>
+            prev.some((p) => p.id === currentUser.id) ? prev : [...prev, currentUser]
+          );
+          setRefusedCount((prev) => (hasRefused ? Math.max(0, prev - 1) : prev));
+        }
         try {
           await outingsService.joinOuting(outing.id);
-        } catch (e) {
+        } catch {
           setHasJoined(false);
+          if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
       }
 
       async function handleLeave() {
         setHasJoined(false);
-
+        if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         try {
           await outingsService.leaveOuting(outing.id);
-        } catch (e) {
+        } catch {
           setHasJoined(true);
+          if (currentUser) setParticipants((prev) => [...prev, currentUser]);
         }
       }
 
       async function handleRefuse() {
         setHasRefused(true);
         setHasJoined(false);
-
+        if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
+        setRefusedCount((prev) => prev + 1);
         try {
           await outingsService.refuseOuting(outing.id);
-        } catch (e) {
+        } catch {
           setHasRefused(false);
+          setRefusedCount((prev) => Math.max(0, prev - 1));
         }
       }
   
@@ -421,7 +433,7 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
       <div className={`w-full rounded-[12px] p-[16px] flex flex-col gap-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] ${
         isMe
           ? "bg-[#152646] text-white"
-          : "bg-white dark:bg-zinc-900 text-[#001A0E] dark:text-zinc-50"
+          : "bg-[#E3EBF9] dark:bg-zinc-900 text-[#001A0E] dark:text-zinc-50"
       }`}>
         {/* Contenu */}
         <div className="flex flex-col gap-[12px]">
@@ -451,19 +463,33 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
               onClick={() => setShowParticipants(true)}
             /> */}
            </div>
-          <div className="flex items-center">
-            {participants.map((p, i) => (
-              <img
-                key={p.id}
-                className={`w-8 h-8 rounded-full border border-white ${i === 0 ? "" : "-ml-2"}`}
-                src="/assets/group-placeholder.png"
-                alt={`${p.firstName} ${p.lastName}`}
-              />
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowParticipants(true)}
+            className="flex items-center gap-[8px] hover:opacity-70 transition cursor-pointer"
+          >
+            <div className="flex items-center">
+              {participants.map((p, i) => (
+                <img
+                  key={p.id}
+                  className={`w-8 h-8 rounded-full border-2 ${isMe ? "border-white/30" : "border-white"} ${i === 0 ? "" : "-ml-2"}`}
+                  src="/assets/group-placeholder.png"
+                  alt={`${p.firstName} ${p.lastName}`}
+                />
+              ))}
+              {participants.length === 0 && (
+                <span className={`text-[13px] ${isMe ? "text-white/60" : "text-[#727973]"}`}>Aucun participant</span>
+              )}
+            </div>
+            {participants.length > 0 && (
+              <span className={`text-[13px] ${isMe ? "text-white/70" : "text-[#727973]"}`}>
+                Voir ({participants.length})
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Bouton — rounded-[8px], py-[8px] px-[24px], text-[16px] font-semibold */}
+        {/* Boutons action */}
         <div className="flex flex-col gap-[8px]">
         {isMe ? (
           <button
@@ -486,92 +512,100 @@ function MessageItem({ msg, isMe }: { msg: MessageOut; isMe: boolean }) {
                 onClick={handleJoin}
                 className="w-full rounded-[8px] bg-[#152646] text-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
               >
-              Continuer
-            </button>
-          )}
+                Continuer
+              </button>
+            )}
 
-        {hasRefused ? (
-          <div className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] text-center">
-            Vous avez refusé
-          </div>
-        ) : (
-          <button
-            onClick={handleRefuse}
-            className="w-full rounded-[8px] border border-[#C1C8C1] text-[#727973] bg-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
-          >
-            Refuser
-          </button>
+            {hasRefused ? (
+              <div className="w-full rounded-[8px] bg-zinc-100 text-[#727973] text-[16px] font-semibold py-[8px] px-[24px] text-center">
+                Vous avez refusé
+              </div>
+            ) : (
+              <button
+                onClick={handleRefuse}
+                className="w-full rounded-[8px] border border-[#C1C8C1] text-[#727973] bg-white text-[16px] font-semibold py-[8px] px-[24px] cursor-pointer text-center"
+              >
+                Refuser
+              </button>
+            )}
+          </>
         )}
-      </>
-    )}
-    </div>
+        </div>
           </div>
 
       {showParticipants && (
         <div className="fixed inset-0 z-50 flex items-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowParticipants(false)} />
 
-            <div className="relative w-full max-w-md mx-auto h-[50vh] bg-white dark:bg-zinc-900 rounded-t-[24px] p-[20px] animate-slideUp overflow-hidden">
-            <div className="w-[40px] h-[4px] bg-zinc-300 rounded-full mx-auto mb-[20px]" />
-
-            <div className="flex items-center justify-between mb-[16px]">
-              <p>
-                {outing.location}
-              </p>
-              {outing.date && (
-                <span className="text-[14px] text-[#727973]">
-                  {formatShortDate(outing.date)}
-                </span>
-              )}
+          <div className="relative w-full max-w-md mx-auto h-[60vh] bg-white dark:bg-zinc-900 rounded-t-[24px] flex flex-col overflow-hidden">
+            {/* Handle */}
+            <div className="flex-shrink-0 pt-[12px] pb-[4px] px-[20px]">
+              <div className="w-[40px] h-[4px] bg-zinc-300 rounded-full mx-auto" />
             </div>
 
-            <h3 className="text-[18px] font-semibold mb-[12px] ml-[40px] text-[#001A0E] dark:text-zinc-50 leading-normal">
-                Participants 
-            </h3>
+            {/* Header */}
+            <div className="flex-shrink-0 flex items-center justify-between px-[20px] py-[12px] border-b border-zinc-100 dark:border-zinc-800">
+              <div>
+                <p className="text-[16px] font-semibold text-[#001A0E] dark:text-zinc-50">{outing.title}</p>
+                <p className="text-[13px] text-[#727973]">{formatShortDate(outing.date)}</p>
+              </div>
+              <button type="button" onClick={() => setShowParticipants(false)} className="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-[#727973] cursor-pointer hover:opacity-70 transition">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
 
-            <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
-              Acceptés :  {participants.length}
-            </h5>
+            {/* Contenu scrollable */}
+            <div className="flex-1 overflow-y-auto px-[20px] py-[16px] flex flex-col gap-[20px]">
 
-            <div className="flex flex-col gap-[12px] overflow-y-auto">
-              {participants.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
-                >
-                  <img
-                    src="/assets/group-placeholder.png"
-                    alt={`${p.firstName} ${p.lastName}`}
-                    className="w-8 h-8 rounded-full"
-                  />
-
-                  <span>
-                    {p.firstName} {p.lastName.charAt(0)}.
-                  </span>
+              {/* Acceptés */}
+              <div className="flex flex-col gap-[10px]">
+                <div className="flex items-center gap-[8px]">
+                  <div className="w-[24px] h-[24px] rounded-full bg-[#E8F5E9] flex items-center justify-center flex-shrink-0">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#426200" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <span className="text-[14px] font-semibold text-[#426200]">Acceptés · {participants.length}</span>
                 </div>
-              ))}
-            </div>
+                {participants.length === 0 ? (
+                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun participant pour l'instant</p>
+                ) : (
+                  <div className="flex flex-col gap-[8px]">
+                    {participants.map((p) => (
+                      <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-[#F4FAF0] dark:bg-zinc-800">
+                        <img src="/assets/group-placeholder.png" alt={`${p.firstName} ${p.lastName}`} className="w-[36px] h-[36px] rounded-full flex-shrink-0" />
+                        <span className="text-[14px] font-medium text-[#001A0E] dark:text-zinc-100">{p.firstName} {p.lastName.charAt(0)}.</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <h5 className="text-[14px] text-[#727973] mb-[12px] ml-[40px]">
-              Refusés :  {outing.participantCountrefused}
-            </h5>
-
-            <div className="flex flex-col gap-[12px] overflow-y-auto">
-              {Array.from({ length: outing.participantCountrefused }).map((_, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-[12px] p-[12px] rounded-[12px] bg-zinc-100 dark:bg-zinc-800"
-                >
-                  <div className="w-10 h-10 rounded-full bg-zinc-300" />
-                  <span>Participant </span>
+              {/* Refusés */}
+              <div className="flex flex-col gap-[10px]">
+                <div className="flex items-center gap-[8px]">
+                  <div className="w-[24px] h-[24px] rounded-full bg-zinc-100 flex items-center justify-center flex-shrink-0">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#727973" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </div>
+                  <span className="text-[14px] font-semibold text-[#727973]">Refusés · {refusedCount}</span>
                 </div>
-              ))}
-            </div>
+                {refusedCount === 0 ? (
+                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun refus pour l'instant</p>
+                ) : (
+                  <div className="flex flex-col gap-[8px]">
+                    {Array.from({ length: refusedCount }).map((_, i) => (
+                      <div key={i} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-zinc-50 dark:bg-zinc-800">
+                        <div className="w-[36px] h-[36px] rounded-full bg-zinc-200 dark:bg-zinc-700 flex-shrink-0" />
+                        <span className="text-[14px] text-[#727973]">Participant anonyme</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[300px] bg-gradient-to-t from-pink-200/70 via-pink-100/30 to-transparent" />
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 }
+
