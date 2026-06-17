@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -118,12 +118,12 @@ export default function DiscussionPage() {
   if (!isReady) return null;
 
   return (
-    // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans dark:bg-black overflow-hidden">
-      <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5] dark:bg-black">
+    // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans overflow-hidden">
+      <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5]">
       <main className="flex w-full max-w-md h-full flex-col relative">
 
         {/* EN-TÊTE — h-[52px], border-b, px-[20px] */}
-        <div className="w-full flex items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] dark:bg-black sticky top-0 z-10">
+        <div className="w-full flex items-center h-[90px] px-[20px] border-b border-[rgba(193,200,193,0.3)] bg-[#FAF9F5] sticky top-0 z-10">
 
           {/* Espace symétrique à gauche */}
           <div className="w-[40px] flex-shrink-0" />
@@ -140,19 +140,19 @@ export default function DiscussionPage() {
                     key={m.id}
                     src={m.avatarUrl}
                     alt={`${m.firstName} ${m.lastName}`}
-                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 object-cover ${["z-30", "z-20", "z-10"][i]}`}
+                    className={`w-8 h-8 rounded-full border-2 border-white object-cover ${["z-30", "z-20", "z-10"][i]}`}
                   />
                 ) : (
                   <img
                     key={m.id}
                     src="/pdp.png"
                     alt={`${m.firstName} ${m.lastName}`}
-                    className={`w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 object-cover ${["z-30", "z-20", "z-10"][i]}`}
+                    className={`w-8 h-8 rounded-full border-2 border-white object-cover ${["z-30", "z-20", "z-10"][i]}`}
                   />
                 )
               ))}
             </div>
-            <h1 className="text-[20px] font-bold text-[#001A0E] dark:text-zinc-50 leading-[28px] tracking-[-0.5px] truncate">
+            <h1 className="text-[20px] font-bold text-[#001A0E] leading-[28px] tracking-[-0.5px] truncate">
               {groupName ?? "..."}
             </h1>
           </div>
@@ -180,17 +180,17 @@ export default function DiscussionPage() {
 
           {/* Carte de bienvenue — px-[32px] intérieur, card p-[16px], rounded-[12px] */}
           <div className="px-[32px]">
-            <div className="flex flex-col gap-[24px] items-start p-[16px] bg-[#E3EBF9] dark:bg-zinc-900 rounded-[12px] w-full">
-              <div className="w-full flex flex-col gap-[16px] text-center text-[#001A0E] dark:text-zinc-50">
+            <div className="flex flex-col gap-[24px] items-start p-[16px] bg-[#E3EBF9] rounded-[12px] w-full">
+              <div className="w-full flex flex-col gap-[16px] text-center text-[#001A0E]">
                 <h2 className="text-[18px] font-bold leading-normal">
                   Bienvenue dans le groupe !
                 </h2>
-                <p className="text-[14px] leading-normal text-[#001A0E] dark:text-zinc-400">
+                <p className="text-[14px] leading-normal text-[#001A0E]">
                   Ce groupe réunit des personnes que vous avez peut-être déjà croisées ici.
                 </p> 
               </div>
               <div className="w-full flex flex-col gap-[16px] items-start">
-                <p className="text-[16px] font-semibold text-[#001A0E] dark:text-zinc-300 text-center w-full leading-normal">
+                <p className="text-[16px] font-semibold text-[#001A0E] text-center w-full leading-normal">
                   Pour commencer, vous pouvez proposer un moment ensemble
                 </p>
                 <button
@@ -207,7 +207,7 @@ export default function DiscussionPage() {
           </div>
 
           {/* Infos système — text-[14px], text-[#424843] */}
-          <div className="text-center text-[14px] text-[#424843] dark:text-zinc-400 leading-normal">
+          <div className="text-center text-[14px] text-[#424843] leading-normal">
             Groupe modéré pour garantir la sécurité de tous.
           </div>
 
@@ -243,11 +243,11 @@ export default function DiscussionPage() {
         )}
 
         {/* ZONE DE SAISIE — px-[16px], pt-[17px] pb-[16px], border-t */}
-        <div className="w-full px-[16px] pt-[17px] pb-[16px] bg-[#FAF9F5] dark:bg-black border-t border-[rgba(193,200,193,0.2)] flex items-center gap-[12px]">
+        <div className="w-full px-[16px] pt-[17px] pb-[16px] bg-[#FAF9F5] border-t border-[rgba(193,200,193,0.2)] flex items-center gap-[12px]">
           <button
             type="button"
             onClick={() => router.push("/front/sorti")}
-            className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] dark:text-zinc-300 hover:opacity-70 transition cursor-pointer flex-shrink-0"
+            className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] hover:opacity-70 transition cursor-pointer flex-shrink-0"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20" fill="none">
               <path fillRule="evenodd" clipRule="evenodd" d="M14 17V20H16V17H19V15H16V12H14V15H11V17H14ZM0.5875 17.4125C0.979167 17.8042 1.45 18 2 18H9V16H2V8H14V10.025H16V4C16 3.45 15.8042 2.97917 15.4125 2.5875C15.0208 2.19583 14.55 2 14 2H13V0H11V2H5V0H3V2H2C1.45 2 0.979167 2.19583 0.5875 2.5875C0.195833 2.97917 0 3.45 0 4V16C0 16.55 0.195833 17.0208 0.5875 17.4125ZM14 6H2V4H14V6Z" fill="#152646"/>
@@ -255,13 +255,13 @@ export default function DiscussionPage() {
           </button>
  
           <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-[12px]">
-            <div className="bg-[#EFEEEA] dark:bg-zinc-900 rounded-full px-[24px] py-[16px] flex-1">
+            <div className="bg-[#EFEEEA] rounded-full px-[24px] py-[16px] flex-1">
               <input
                 type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Écrire un message..."
-                className="w-full bg-transparent outline-none text-[16px] text-[#001A0E] dark:text-zinc-50 placeholder-[#727973] leading-normal"
+                className="w-full bg-transparent outline-none text-[16px] text-[#001A0E] placeholder-[#727973] leading-normal"
               />
             </div>
             <button
@@ -287,7 +287,7 @@ export default function DiscussionPage() {
 function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: boolean; myUserId: string | null; members: { id: string; firstName: string; lastName: string; avatarUrl: string | null }[] }) {
   if (msg.type === "JOIN") {
     return (
-      <div className="text-center text-[14px] text-[#424843] dark:text-zinc-400 leading-normal">
+      <div className="text-center text-[14px] text-[#424843] leading-normal">
         {AuthorName(msg.user)} a rejoint le groupe
       </div>
     );
@@ -300,14 +300,14 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
   return (
     <div className={`flex flex-col w-full ${isMe ? "items-end pl-[56px]" : "items-start pr-[56px]"}`}>
       {!isMe && (
-        <span className="text-[14px] text-[#424843] dark:text-zinc-400 mb-[4px] leading-normal">
+        <span className="text-[14px] text-[#424843] mb-[4px] leading-normal">
           {AuthorName(msg.user)}
         </span>
       )}
       <div className={`max-w-[286px] rounded-[12px] p-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] flex gap-[8px] items-end ${
         isMe
           ? "bg-[#152546] text-white rounded-tl-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tr-none"
-          : "bg-[#E3EBF9] dark:bg-zinc-900 text-[#FFFFF] dark:text-zinc-50 rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
+          : "bg-[#E3EBF9] text-[#001A0E] rounded-tr-[12px] rounded-bl-[12px] rounded-br-[12px] rounded-tl-none"
       }`}>
         <p className="break-words leading-normal text-[16px] flex-1 min-w-0">{msg.content}</p>
         <span className={`text-[12px] leading-[18px] whitespace-nowrap flex-shrink-0 ${isMe ? "text-white/70" : "text-[#727973]"}`}>
@@ -450,25 +450,25 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
       <div className={`w-full rounded-[12px] p-[16px] flex flex-col gap-[16px] drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)] ${
         isMe
           ? "bg-[#152646] text-white"
-          : "bg-[#E3EBF9] dark:bg-zinc-900 text-[#001A0E] dark:text-zinc-50"
+          : "bg-[#E3EBF9] text-[#001A0E]"
       }`}>
         {/* Contenu */}
         <div className="flex flex-col gap-[12px]">
           <div className="flex flex-col gap-[8px]">
-            <p className={`text-[18px] font-semibold leading-normal ${isMe ? "text-white" : "text-[#001A0E] dark:text-zinc-100"}`}>
+            <p className={`text-[18px] font-semibold leading-normal ${isMe ? "text-white" : "text-[#001A0E]"}`}>
               {outing.title}
             </p>
             <div className="flex flex-col gap-[4px]">
-              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E] dark:text-zinc-300"}`}>
+              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E]"}`}>
                 {formatOutingDate(outing.date)}
               </p>
-              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E] dark:text-zinc-300"}`}>
+              <p className={`text-[16px] leading-normal ${isMe ? "text-white/80" : "text-[#001A0E]"}`}>
                 {outing.location}
               </p>
             </div>
           </div>
           <div className="flex flex-col gap-[4px]">
-            <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843] dark:text-zinc-400"}`}>
+            <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843]"}`}>
               Places : {outing.participantCount}/{outing.maxSpots}
             </p>
             {/* <SpotsIndicator participantCount={outing.participantCount} maxSpots={outing.maxSpots} isMe={isMe} /> */}
@@ -557,19 +557,19 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
         <div className="fixed inset-0 z-50 flex items-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowParticipants(false)} />
 
-          <div className="relative w-full max-w-md mx-auto h-[60vh] bg-white dark:bg-zinc-900 rounded-t-[24px] flex flex-col overflow-hidden">
+          <div className="relative w-full max-w-md mx-auto h-[60vh] bg-white rounded-t-[24px] flex flex-col overflow-hidden">
             {/* Handle */}
             <div className="flex-shrink-0 pt-[12px] pb-[4px] px-[20px]">
               <div className="w-[40px] h-[4px] bg-zinc-300 rounded-full mx-auto" />
             </div>
 
             {/* Header */}
-            <div className="flex-shrink-0 flex items-center justify-between px-[20px] py-[12px] border-b border-zinc-100 dark:border-zinc-800">
+            <div className="flex-shrink-0 flex items-center justify-between px-[20px] py-[12px] border-b border-zinc-100">
               <div>
-                <p className="text-[16px] font-semibold text-[#001A0E] dark:text-zinc-50">{outing.title}</p>
+                <p className="text-[16px] font-semibold text-[#001A0E]">{outing.title}</p>
                 <p className="text-[13px] text-[#727973]">{formatShortDate(outing.date)}</p>
               </div>
-              <button type="button" onClick={() => setShowParticipants(false)} className="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-[#727973] cursor-pointer hover:opacity-70 transition">
+              <button type="button" onClick={() => setShowParticipants(false)} className="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-zinc-100 text-[#727973] cursor-pointer hover:opacity-70 transition">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -591,9 +591,9 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                 ) : (
                   <div className="flex flex-col gap-[8px]">
                     {participants.map((p) => (
-                      <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-[#F4FAF0] dark:bg-zinc-800">
+                      <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-[#F4FAF0]">
                         <img src="/pdp.png" alt={`${p.firstName} ${p.lastName}`} className="w-[36px] h-[36px] rounded-full flex-shrink-0" />
-                        <span className="text-[14px] font-medium text-[#001A0E] dark:text-zinc-100">{p.firstName} {p.lastName.charAt(0)}.</span>
+                        <span className="text-[14px] font-medium text-[#001A0E]">{p.firstName} {p.lastName.charAt(0)}.</span>
                       </div>
                     ))}
                   </div>
@@ -615,11 +615,11 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                     {refusedParticipants.map((p) => {
                       const member = members.find((m) => m.id === p.id);
                       return (
-                        <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-zinc-50 dark:bg-zinc-800">
+                        <div key={p.id} className="flex items-center gap-[12px] px-[12px] py-[10px] rounded-[12px] bg-zinc-50">
                           {member?.avatarUrl ? (
                             <img src={member.avatarUrl} alt={p.firstName} className="w-[36px] h-[36px] rounded-full object-cover flex-shrink-0" />
                           ) : (
-                            <div className="w-[36px] h-[36px] rounded-full bg-zinc-200 dark:bg-zinc-700 flex-shrink-0" />
+                            <div className="w-[36px] h-[36px] rounded-full bg-zinc-200 flex-shrink-0" />
                           )}
                           <span className="text-[14px] text-[#727973]">{p.firstName} {p.lastName.charAt(0)}.</span>
                         </div>
