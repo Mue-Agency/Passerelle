@@ -1,8 +1,14 @@
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 
-const SECRET = process.env.SESSION_SECRET || "dev-secret-change-in-prod";
+function requireEnv(key: string): string {
+  const value = process.env[key];
+  if (!value) throw new Error(`Variable d'environnement manquante : ${key}`);
+  return value;
+}
 
-const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+const SECRET = requireEnv("SESSION_SECRET");
+
+export const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
 export function createToken(userId: string): string {
   const expiresAt = Date.now() + TOKEN_TTL_MS;
@@ -22,7 +28,9 @@ export function verifyToken(token: string): string | null {
 
   const payload = `${userId}.${expiresAtStr}`;
   const expected = createHmac("sha256", SECRET).update(payload).digest("hex");
-  if (sig !== expected) return null;
+  const sigBuf = Buffer.from(sig);
+  const expectedBuf = Buffer.from(expected);
+  if (sigBuf.length !== expectedBuf.length || !timingSafeEqual(sigBuf, expectedBuf)) return null;
 
   if (Date.now() >= expiresAt) return null;
 

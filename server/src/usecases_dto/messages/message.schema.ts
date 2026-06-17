@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const MessageOut = z.object({
   id:      z.string(),
-  type:    z.string(),
+  type:    z.enum(["TEXT", "OUTING", "JOIN"]),
   content: z.string().nullable(),
   sentAt:  z.date(),
   user:    z.object({
@@ -16,8 +16,9 @@ export const MessageOut = z.object({
     date:             z.date(),
     location:         z.string(),
     maxSpots:         z.number(),
-    participantCount: z.number(),
-    isParticipant:    z.boolean(),
+    participantCount:        z.number(),
+    participantCountrefused: z.number(),
+    isParticipant:           z.boolean(),
   }).nullable(),
 });
 

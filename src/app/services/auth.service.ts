@@ -1,4 +1,4 @@
-import { apiUrl, handleResponse } from "./_http";
+import { request } from "./_http";
 
 type RegisterInput = {
   firstName: string;
@@ -15,26 +15,25 @@ type LoginInput = {
 type AuthResult = {
   userId: string;
   username: string;
-  role: string;
-  token: string;
+  firstName: string;
+  role: "CITOYEN" | "ADMIN";
+  groupId?: string;
 };
 
 export const authService = {
-  async register(input: RegisterInput) {
-    const res = await fetch(apiUrl("/api/auth/register"), {
+  register(input: RegisterInput) {
+    return request<AuthResult>("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<AuthResult>(res);
   },
 
-  async login(input: LoginInput) {
-    const res = await fetch(apiUrl("/api/auth/login"), {
+  login(input: LoginInput) {
+    return request<AuthResult>("/api/auth/login?app=front", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(input),
     });
-    return handleResponse<AuthResult>(res);
   },
 };

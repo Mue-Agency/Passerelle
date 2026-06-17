@@ -1,13 +1,32 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 import { createToken } from "../lib/auth";
+import { SESSION_COOKIE, sessionCookieOptions, clearSessionCookieOptions } from "../lib/cookies";
 import {
   register, RegisterDtoIn,
   registerAdmin, RegisterAdminDtoIn,
   login, LoginDtoIn,
 } from "../usecases_dto/auth";
 import { createJoinMessage } from "../usecases_dto/messages";
+import { prisma } from "../lib/prisma";
 
 export const authRouter = Router();
+
+// Logout : doit toujours réussir (placé avant le rate-limiter).
+authRouter.post("/logout", (_req, res) => {
+  res.clearCookie(SESSION_COOKIE, clearSessionCookieOptions());
+  res.json({ ok: true });
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Trop de tentatives, réessayez dans 15 minutes." },
+});
+
+authRouter.use(authLimiter);
 
 authRouter.post("/register", async (req, res) => {
   const parsed = RegisterDtoIn.safeParse(req.body);
@@ -19,6 +38,7 @@ authRouter.post("/register", async (req, res) => {
   try {
     const result = await register(parsed.data);
     const token = createToken(result.userId);
+    res.cookie(SESSION_COOKIE, token, sessionCookieOptions());
 
     if (result.groupId) {
       try {
@@ -28,14 +48,14 @@ authRouter.post("/register", async (req, res) => {
         });
         const io = req.app.get("io");
         io.to(`group:${result.groupId}`).emit("new-message", joinMsg);
-      } catch {}
+      } catch (e) { console.error("[joinMessage]", e); }
     }
 
     res.status(201).json({
       userId: result.userId,
       username: result.username,
       role: result.role,
-      token,
+      groupId: result.groupId,
     });
   } catch (err) {
     console.error("[POST /api/auth/register]", err);
@@ -53,12 +73,13 @@ authRouter.post("/register-admin", async (req, res) => {
   try {
     const result = await registerAdmin(parsed.data);
     const token = createToken(result.userId);
+    res.cookie(SESSION_COOKIE, token, sessionCookieOptions());
 
     res.status(201).json({
       userId: result.userId,
       username: result.username,
+      firstName: result.firstName,
       role: result.role,
-      token,
     });
   } catch (err: unknown) {
     if (err instanceof Error && err.message === "INVALID_SECRET") {
@@ -80,12 +101,23 @@ authRouter.post("/login", async (req, res) => {
   try {
     const result = await login(parsed.data);
     const token = createToken(result.userId);
+    res.cookie(SESSION_COOKIE, token, sessionCookieOptions());
+
+    let groupId: string | undefined;
+    if (req.query.app === "front") {
+      const membership = await prisma.groupMember.findFirst({
+        where: { userId: result.userId },
+        select: { groupId: true },
+      });
+      groupId = membership?.groupId;
+    }
 
     res.json({
       userId: result.userId,
       username: result.username,
+      firstName: result.firstName,
       role: result.role,
-      token,
+      ...(groupId && { groupId }),
     });
   } catch (err: unknown) {
     if (err instanceof Error && err.message === "INVALID_CREDENTIALS") {

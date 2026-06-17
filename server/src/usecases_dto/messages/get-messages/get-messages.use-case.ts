@@ -10,12 +10,21 @@ export async function getMessages(dto: GetMessagesDtoIn): Promise<GetMessagesDto
   const messages = await prisma.message.findMany({
     where: { groupId: dto.groupId },
     orderBy: { sentAt: "asc" },
+    take: dto.take ?? 50,
+    ...(dto.cursor && {
+      cursor: { id: dto.cursor },
+      skip: 1,
+    }),
     include: {
       user: { select: { id: true, firstName: true, lastName: true } },
       outing: {
         include: {
-          _count: { select: { participants: true } },
-          participants: { select: { userId: true } },
+          _count: {
+            select: {
+              participants: { where: { status: "ACCEPTED" } },
+            },
+          },
+          participants: { select: { userId: true, status: true } },
         },
       },
     },
@@ -35,7 +44,8 @@ export async function getMessages(dto: GetMessagesDtoIn): Promise<GetMessagesDto
           location: msg.outing.location,
           maxSpots: msg.outing.maxSpots,
           participantCount: msg.outing._count.participants,
-          isParticipant: msg.outing.participants.some((p) => p.userId === dto.userId),
+          participantCountrefused: msg.outing.participants.filter((p) => p.status === "REFUSED").length,
+          isParticipant: msg.outing.participants.some((p) => p.userId === dto.userId && p.status === "ACCEPTED"),
         }
       : null,
   }));

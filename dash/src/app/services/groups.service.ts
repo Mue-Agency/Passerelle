@@ -1,6 +1,6 @@
-import { apiUrl, authHeaders, handleResponse } from "./_http";
+import { request, type Result } from "./_http";
 
-type Group = {
+export type Group = {
   id: string;
   name: string;
   lieu: string;
@@ -10,7 +10,7 @@ type Group = {
   totalMembers: number;
 };
 
-type CreateGroupResult = {
+export type CreateGroupResult = {
   id: string;
   name: string;
   lieu: string;
@@ -20,19 +20,15 @@ type CreateGroupResult = {
 };
 
 export const groupsService = {
-  async list() {
-    const res = await fetch(apiUrl("/api/groups"), {
-      headers: authHeaders(),
-    });
-    return handleResponse<Group[]>(res);
+  list(): Promise<Result<Group[]>> {
+    return request<Group[]>("/api/groups");
   },
 
-  async create(name: string, lieu: string) {
-    const res = await fetch(apiUrl("/api/groups"), {
+  create(name: string, lieu: string): Promise<Result<CreateGroupResult>> {
+    return request<CreateGroupResult>("/api/groups", {
       method: "POST",
-      headers: authHeaders({ "Content-Type": "application/json" }),
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, lieu }),
     });
-    return handleResponse<CreateGroupResult>(res);
   },
 };

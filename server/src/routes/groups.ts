@@ -7,6 +7,7 @@ import {
   createGroup,
   CreateGroupDtoIn,
   listGroups,
+  getGroupMembers,
 } from "../usecases_dto/groups";
 
 export const groupsRouter = Router();
@@ -35,8 +36,16 @@ groupsRouter.post("/", requireAdmin, async (req, res) => {
   }
 });
 
-groupsRouter.get("/:groupId", async (req, res) => {
+groupsRouter.get("/:groupId", requireAuth, async (req, res) => {
   try {
+    const member = await prisma.groupMember.findUnique({
+      where: { userId_groupId: { userId: req.userId!, groupId: req.params.groupId as string } },
+    });
+    if (!member) {
+      res.status(403).json({ error: "Vous n'êtes pas membre de ce groupe." });
+      return;
+    }
+
     const result = await getGroup({ groupId: req.params.groupId as string });
     res.json(result);
   } catch (err: unknown) {
@@ -48,36 +57,15 @@ groupsRouter.get("/:groupId", async (req, res) => {
   }
 });
 
-groupsRouter.get("/:groupId/members", async (req, res) => {
-  const groupId = req.params.groupId as string as string;
-
+groupsRouter.get("/:groupId/members", requireAuth, async (req, res, next) => {
   try {
-    const group = await prisma.group.findUnique({
-      where: { id: groupId },
-      select: {
-        members: {
-          select: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                avatarUrl: true,
-              },
-            },
-          },
-        },
-      },
+    const result = await getGroupMembers({
+      groupId: req.params.groupId as string,
+      userId: req.userId!,
     });
-
-    if (!group) {
-      res.status(404).json({ error: "Groupe introuvable." });
-      return;
-    }
-
-    res.json({ members: group.members.map((member) => member.user) });
-  } catch {
-    res.status(500).json({ error: "Erreur serveur." });
+    res.json(result);
+  } catch (err) {
+    next(err);
   }
 });
 

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/front", "/"];
-const protectedRoutes = ["/front/discu", "/front/sorti"];
+const publicRoutes = ["/connexion", "/inscription"];
+const protectedRoutes = ["/dashboard"];
 
 // Filtrage UX uniquement : présence + expiration du token (userId.expiresAt.sig),
 // SANS vérifier la signature (le secret reste sur l'API, qui fait la vraie validation).
@@ -21,16 +21,16 @@ export function proxy(request: NextRequest) {
   const authed = hasValidSession(token);
 
   if (protectedRoutes.some((r) => path.startsWith(r)) && !authed) {
-    return NextResponse.redirect(new URL("/front", request.url));
+    return NextResponse.redirect(new URL("/connexion", request.url));
   }
 
   if (publicRoutes.includes(path) && authed) {
-    return NextResponse.redirect(new URL("/front/discu", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/front", "/front/:path*"],
+  matcher: ["/", "/connexion", "/inscription", "/dashboard/:path*"],
 };

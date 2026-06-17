@@ -1,22 +1,16 @@
-import { apiUrl, authHeaders, handleResponse } from "./_http";
+import { request } from "./_http";
 
-type GroupOut = { id: string; name: string };
-type MemberOut = { id: string; firstName: string; lastName: string };
+type GroupOut = { id: string; name: string; lieu: string };
+type MemberOut = { id: string; firstName: string; lastName: string; avatarUrl: string | null };
 
 type GroupMembersOut = { members: MemberOut[] };
 
 export const groupsService = {
-  async getGroup(groupId: string) {
-    const res = await fetch(apiUrl(`/api/groups/${groupId}`), {
-      headers: authHeaders(),
-    });
-    return handleResponse<GroupOut>(res);
+  getGroup(groupId: string) {
+    return request<GroupOut>(`/api/groups/${groupId}`);
   },
 
-  async getGroupMembers(groupId: string) {
-    const res = await fetch(apiUrl(`/api/groups/${groupId}/members`), {
-      headers: authHeaders(),
-    });
-    return handleResponse<GroupMembersOut>(res);
+  getGroupMembers(groupId: string) {
+    return request<GroupMembersOut>(`/api/groups/${groupId}/members`);
   },
 };

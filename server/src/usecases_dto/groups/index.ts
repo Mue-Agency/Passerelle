@@ -12,3 +12,6 @@ export type { CreateGroupDtoOut } from "./create-group/create-group.dto";
 
 export { listGroups } from "./list-groups/list-groups.use-case";
 export type { ListGroupsDtoOut } from "./list-groups/list-groups.dto";
+
+export { getGroupMembers } from "./get-group-members/get-group-members.use-case";
+export type { GetGroupMembersDtoOut } from "./get-group-members/get-group-members.dto";
