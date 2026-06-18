@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { messagesService } from "@/app/services/messages.service";
 import type { MessageOut } from "@/app/services/messages.service";
 import { getSocket } from "@/app/lib/socket";
@@ -11,16 +11,15 @@ export function useMessages(groupId: string | null) {
   const [messages, setMessages] = useState<MessageOut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchMessages = useCallback(async (gId: string) => {
-    const result = await messagesService.getMessages(gId);
-    if (result.isOk) setMessages(result.data);
-    return result;
-  }, []);
-
   useEffect(() => {
     if (!groupId) return;
 
-    fetchMessages(groupId).then(() => setIsLoading(false));
+    let cancelled = false;
+    messagesService.getMessages(groupId).then((result) => {
+      if (cancelled) return;
+      if (result.isOk) setMessages(result.data);
+      setIsLoading(false);
+    });
 
     const socket = getSocket();
     if (!socket.connected) socket.connect();
@@ -56,11 +55,12 @@ export function useMessages(groupId: string | null) {
     socket.on("outing-updated", handleOutingUpdated);
 
     return () => {
+      cancelled = true;
       socket.off("new-message", handleNewMessage);
       socket.off("outing-updated", handleOutingUpdated);
       socket.emit("leave-group", groupId);
     };
-  }, [groupId, fetchMessages]);
+  }, [groupId]);
 
   return { messages, isLoading };
 }

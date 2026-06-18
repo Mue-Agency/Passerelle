@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    // Avatars servis depuis l'origine API (URL dynamique en variable d'env) :
+    // next/image n'apporte pas de gain pertinent ici. <img> assumé.
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
