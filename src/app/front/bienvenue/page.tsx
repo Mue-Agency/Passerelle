@@ -60,8 +60,9 @@ export default function BienvenuePage() {
                     <div className="relative h-16 w-16">
                         <div className="h-16 w-16 rounded-full bg-[#C7D7F3]" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 40 40" fill="none" >
-                                <path d="M17.2 29.2L31.3 15.1L28.5 12.3L17.2 23.6L11.5 17.9L8.7 20.7L17.2 29.2ZM20 40C17.2333 40 14.6333 39.475 12.2 38.425C9.76667 37.375 7.65 35.95 5.85 34.15C4.05 32.35 2.625 30.2333 1.575 27.8C0.525 25.3667 0 22.7667 0 20C0 17.2333 0.525 14.6333 1.575 12.2C2.625 9.76667 4.05 7.65 5.85 5.85C7.65 4.05 9.76667 2.625 12.2 1.575C14.6333 0.525 17.2333 0 20 0C22.7667 0 25.3667 0.525 27.8 1.575C30.2333 2.625 32.35 4.05 34.15 5.85C35.95 7.65 37.375 9.76667 38.425 12.2C39.475 14.6333 40 17.2333 40 20C40 22.7667 39.475 25.3667 38.425 27.8C37.375 30.2333 35.95 32.35 34.15 34.15C32.35 35.95 30.2333 37.375 27.8 38.425C25.3667 39.475 22.7667 40 20 40Z" fill="#152646" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+                                <path d="M33 16.62V18C32.9982 21.2346 31.9508 24.382 30.014 26.9727C28.0773 29.5634 25.3549 31.4587 22.253 32.3758C19.1511 33.293 15.8359 33.1828 12.8017 32.0619C9.76752 30.9409 7.17698 28.8691 5.41644 26.1556C3.6559 23.442 2.81969 20.2321 3.03252 17.0045C3.24534 13.7768 4.49581 10.7045 6.59742 8.24559C8.69903 5.78671 11.5392 4.07305 14.6943 3.3602C17.8494 2.64734 21.1504 2.97349 24.105 4.28998" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M33 6L18 21.015L13.5 16.515" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </div>
                     </div>
@@ -69,21 +70,21 @@ export default function BienvenuePage() {
                         Bienvenue !
                     </h1>
 
-                    <p className="text-base leading-7 text-zinc-600">
+                    <p className="text-base leading-7 text-zinc-600 font-medium">
                         Vous faites maintenant partie du groupe {groupName ? `« ${groupName} »` : ""}. Vous pouvez discuter et proposer une sortie ensemble.
                     </p>
 
                 </div>
 
                 <div className="flex flex-col items-center gap-6 text-center w-full mb-auto">
-                    <h2 className="w-full text-3xl font-semibold leading-10 tracking-tight text-black">
+                    <h2 className="w-full text-2xl font-bold leading-10 tracking-tight text-black">
                         Déjà membres du groupe
                     </h2>
                 </div>
 
                 <div className="flex flex-col gap-[16px] w-full">
                     {members.map((m) => (
-                        <div key={m.id} className="flex items-center gap-[20px] bg-white rounded-[12px] px-[20px] py-[8px]">
+                        <div key={m.id} className="flex items-center gap-[20px] rounded-[12px] px-[20px] py-[8px]">
                             <img
                                 src={m.avatarUrl ?? "/pdp.png"}
                                 alt={`${m.firstName} ${m.lastName}`}
@@ -106,9 +107,9 @@ export default function BienvenuePage() {
                         disabled={!groupId}
                         className="w-full rounded-lg bg-[#152646] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50"
                     >
-                        Voir le Chat
+                        Accéder au groupe
                     </button>
-                    <p className="text-xs text-zinc-400 text-center">
+                    <p className="text-xs text-zinc-400 text-center font-medium">
                         Groupe modéré pour garantir la sécurité de tous.
                     </p>
                 </div>
