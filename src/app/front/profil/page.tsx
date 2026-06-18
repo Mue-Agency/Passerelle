@@ -137,8 +137,8 @@ export default function ProfilPage() {
                                 <img src={avatarUrl} alt="Photo de profil" className="h-full w-full object-cover" />
                             ) : (
                                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                    <path d="M34.5 28.5C34.5 29.2956 34.1839 30.0587 33.6213 30.6213C33.0587 31.1839 32.2956 31.5 31.5 31.5H4.5C3.70435 31.5 2.94129 31.1839 2.37868 30.6213C1.81607 30.0587 1.5 29.2956 1.5 28.5V12C1.5 11.2044 1.81607 10.4413 2.37868 9.87868C2.94129 9.31607 3.70435 9 4.5 9H10.5L13.5 4.5H22.5L25.5 9H31.5C32.2956 9 33.0587 9.31607 33.6213 9.87868C34.1839 10.4413 34.5 11.2044 34.5 12V28.5Z" stroke="#152646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M18 25.5C21.3137 25.5 24 22.8137 24 19.5C24 16.1863 21.3137 13.5 18 13.5C14.6863 13.5 12 16.1863 12 19.5C12 22.8137 14.6863 25.5 18 25.5Z" stroke="#152646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M34.5 28.5C34.5 29.2956 34.1839 30.0587 33.6213 30.6213C33.0587 31.1839 32.2956 31.5 31.5 31.5H4.5C3.70435 31.5 2.94129 31.1839 2.37868 30.6213C1.81607 30.0587 1.5 29.2956 1.5 28.5V12C1.5 11.2044 1.81607 10.4413 2.37868 9.87868C2.94129 9.31607 3.70435 9 4.5 9H10.5L13.5 4.5H22.5L25.5 9H31.5C32.2956 9 33.0587 9.31607 33.6213 9.87868C34.1839 10.4413 34.5 11.2044 34.5 12V28.5Z" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M18 25.5C21.3137 25.5 24 22.8137 24 19.5C24 16.1863 21.3137 13.5 18 13.5C14.6863 13.5 12 16.1863 12 19.5C12 22.8137 14.6863 25.5 18 25.5Z" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             )}
                         </div>
@@ -171,37 +171,39 @@ export default function ProfilPage() {
                     </p>
 
                     <form id="profile-form" onSubmit={handleSubmit} className="w-full flex flex-col gap-4 text-left">
-                        <div className="flex flex-col gap-1.5">
-                            <label htmlFor="prenom" className="text-sm font-medium text-zinc-500">
-                                Prénom
-                            </label>
-                            <input
-                                id="prenom"
-                                type="text"
-                                value={prenom}
-                                onChange={(e) => setPrenom(e.target.value)}
-                                placeholder="ex. Marie"
-                                className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:ring-2 focus:ring-black transition"
-                            />
-                        </div>
+                        <div className="flex gap-3">
+                            <div className="flex flex-col gap-1.5 flex-1">
+                                <label htmlFor="prenom" className="text-sm font-medium text-zinc-500">
+                                    Prénom
+                                </label>
+                                <input
+                                    id="prenom"
+                                    type="text"
+                                    value={prenom}
+                                    onChange={(e) => setPrenom(e.target.value)}
+                                    placeholder="ex. Marie"
+                                    className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:ring-2 focus:ring-black transition"
+                                />
+                            </div>
 
-                        <div className="flex flex-col gap-1.5">
-                            <label htmlFor="nom" className="text-sm font-medium text-zinc-500">
-                                Nom
-                            </label>
-                            <input
-                                id="nom"
-                                type="text"
-                                value={nom}
-                                onChange={(e) => setNom(e.target.value)}
-                                placeholder="ex. Dupont"
-                                className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:ring-2 focus:ring-black transition"
-                            />
+                            <div className="flex flex-col gap-1.5 flex-1">
+                                <label htmlFor="nom" className="text-sm font-medium text-zinc-500">
+                                    Nom
+                                </label>
+                                <input
+                                    id="nom"
+                                    type="text"
+                                    value={nom}
+                                    onChange={(e) => setNom(e.target.value)}
+                                    placeholder="ex. Dupont"
+                                    className="w-full rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-sm text-black outline-none focus:ring-2 focus:ring-black transition"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M20.8401 4.61012C20.3294 4.09912 19.7229 3.69376 19.0555 3.4172C18.388 3.14064 17.6726 2.99829 16.9501 2.99829C16.2276 2.99829 15.5122 3.14064 14.8448 3.4172C14.1773 3.69376 13.5709 4.09912 13.0601 4.61012L12.0001 5.67012L10.9401 4.61012C9.90843 3.57842 8.50915 2.99883 7.05012 2.99883C5.59109 2.99883 4.19181 3.57842 3.16012 4.61012C2.12843 5.64181 1.54883 7.04108 1.54883 8.50012C1.54883 9.95915 2.12843 11.3584 3.16012 12.3901L4.22012 13.4501L12.0001 21.2301L19.7801 13.4501L20.8401 12.3901C21.3511 11.8794 21.7565 11.2729 22.033 10.6055C22.3096 9.93801 22.4519 9.2226 22.4519 8.50012C22.4519 7.77763 22.3096 7.06222 22.033 6.39476C21.7565 5.7273 21.3511 5.12087 20.8401 4.61012V4.61012Z" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20.8401 4.61012C20.3294 4.09912 19.7229 3.69376 19.0555 3.4172C18.388 3.14064 17.6726 2.99829 16.9501 2.99829C16.2276 2.99829 15.5122 3.14064 14.8448 3.4172C14.1773 3.69376 13.5709 4.09912 13.0601 4.61012L12.0001 5.67012L10.9401 4.61012C9.90843 3.57842 8.50915 2.99883 7.05012 2.99883C5.59109 2.99883 4.19181 3.57842 3.16012 4.61012C2.12843 5.64181 1.54883 7.04108 1.54883 8.50012C1.54883 9.95915 2.12843 11.3584 3.16012 12.3901L4.22012 13.4501L12.0001 21.2301L19.7801 13.4501L20.8401 12.3901C21.3511 11.8794 21.7565 11.2729 22.033 10.6055C22.3096 9.93801 22.4519 9.2226 22.4519 8.50012C22.4519 7.77763 22.3096 7.06222 22.033 6.39476C21.7565 5.7273 21.3511 5.12087 20.8401 4.61012V4.61012Z" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             <label className="text-sm font-medium text-zinc-500">
                                 Centres d&apos;intérêts

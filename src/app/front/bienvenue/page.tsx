@@ -61,8 +61,8 @@ export default function BienvenuePage() {
                         <div className="h-16 w-16 rounded-full bg-[#C7D7F3]" />
                         <div className="absolute inset-0 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
-                                <path d="M33 16.62V18C32.9982 21.2346 31.9508 24.382 30.014 26.9727C28.0773 29.5634 25.3549 31.4587 22.253 32.3758C19.1511 33.293 15.8359 33.1828 12.8017 32.0619C9.76752 30.9409 7.17698 28.8691 5.41644 26.1556C3.6559 23.442 2.81969 20.2321 3.03252 17.0045C3.24534 13.7768 4.49581 10.7045 6.59742 8.24559C8.69903 5.78671 11.5392 4.07305 14.6943 3.3602C17.8494 2.64734 21.1504 2.97349 24.105 4.28998" stroke="#152646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M33 6L18 21.015L13.5 16.515" stroke="#152646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M33 16.62V18C32.9982 21.2346 31.9508 24.382 30.014 26.9727C28.0773 29.5634 25.3549 31.4587 22.253 32.3758C19.1511 33.293 15.8359 33.1828 12.8017 32.0619C9.76752 30.9409 7.17698 28.8691 5.41644 26.1556C3.6559 23.442 2.81969 20.2321 3.03252 17.0045C3.24534 13.7768 4.49581 10.7045 6.59742 8.24559C8.69903 5.78671 11.5392 4.07305 14.6943 3.3602C17.8494 2.64734 21.1504 2.97349 24.105 4.28998" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M33 6L18 21.015L13.5 16.515" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </div>
                     </div>
