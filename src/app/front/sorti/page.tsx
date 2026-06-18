@@ -182,7 +182,7 @@ function SortieContent() {
         <form id="sortie-form" onSubmit={handleSubmit} className="flex-1 flex flex-col px-6 pb-24">
 
           {/* TITRE */}
-          <h2 className="text-xl font-bold text-[#001A0E] mt-4 mb-6">
+          <h2 className="text-xl text-center font-bold text-[#001A0E] mt-4 mb-6">
             {isEditMode ? "Modifier la sortie" : "Proposer une sortie"}
           </h2>
 
@@ -228,13 +228,12 @@ function SortieContent() {
           <div className="flex flex-col gap-6">
             {/* Titre de la sortie */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold text-[#001A0E] pl-1">
+              <label className="text-sm font-bold text-[#001A0E] pl-1">
                 Titre de la sortie
               </label>
-              <div className="flex items-center gap-3 bg-zinc-100/60 border border-zinc-200/50 rounded-xl px-4 py-3.5">
-                <svg width="16" height="18" viewBox="0 0 16 18" fill="none" className="flex-shrink-0">
-                  <path d="M0 0h10l6 6v12H0V0z" fill="none" stroke="#999" strokeWidth="1.5" />
-                  <path d="M10 0v6h6" fill="none" stroke="#999" strokeWidth="1.5" />
+              <div className="flex items-center gap-3 bg-[#E3EBF9] border border-zinc-200/50 rounded-xl px-4 py-3.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M11 1L14.09 7.26L21 8.27L16 13.14L17.18 20.02L11 16.77L4.82 20.02L6 13.14L1 8.27L7.91 7.26L11 1Z" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <input
                   type="text"
@@ -252,10 +251,7 @@ function SortieContent() {
                 <label className="text-sm font-bold text-[#001A0E]">
                   Date
                 </label>
-                <div className="flex items-center gap-2 bg-zinc-100/60 border border-zinc-200/50 rounded-xl px-3 py-3.5">
-                  <svg width="18" height="20" viewBox="0 0 18 20" fill="none" className="flex-shrink-0">
-                    <path d="M5 0v3M13 0v3M0 7h18M2 2h14a2 2 0 012 2v14a2 2 0 01-2 2H2a2 2 0 01-2-2V4a2 2 0 012-2z" stroke="#999" strokeWidth="1.5" />
-                  </svg>
+                <div className="flex items-center gap-2 bg-[#E3EBF9] border border-zinc-200/50 rounded-xl px-3 py-3.5">
                   <input
                     type="date"
                     value={date}
@@ -268,11 +264,8 @@ function SortieContent() {
                 <label className="text-sm font-bold text-[#001A0E] pl-1">
                   Heure
                 </label>
-                <div className="flex items-center gap-2 bg-zinc-100/60 border border-zinc-200/50 rounded-xl px-3 py-3.5">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="flex-shrink-0">
-                    <circle cx="10" cy="10" r="9" stroke="#999" strokeWidth="1.5" />
-                    <path d="M10 4v6l4 2" stroke="#999" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
+                <div className="flex items-center gap-2 bg-[#E3EBF9] border border-zinc-200/50 rounded-xl px-3 py-3.5">
+                  
                   <input
                     type="time"
                     value={time}
@@ -373,10 +366,15 @@ function SortieContent() {
                       <button
                         type="button"
                         onClick={() => setPollSlots((prev) => prev.filter((_, j) => j !== i))}
-                        className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-zinc-400 hover:bg-zinc-100 transition cursor-pointer flex-shrink-0"
+                        className="w-7 h-7 flex items-center justify-center  text-zinc-400 hover:bg-zinc-100 transition cursor-pointer flex-shrink-0"
                       >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                      </button>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M3 6H5H21" stroke="#D20787" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#D20787" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M10 11V17" stroke="#D20787" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M14 11V17" stroke="#D20787" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>                    
+                    </button>
                     )}
                   </div>
                 ))}
@@ -386,7 +384,7 @@ function SortieContent() {
                   className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#152646]/30 py-2.5 text-xs font-medium text-[#152646] hover:bg-[#152646]/5 transition cursor-pointer"
                 >
                   <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 0v14M0 7h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-                  Ajouter un créneau
+                  Ajouter un horaire
                 </button>
               </div>
             </div>
@@ -447,10 +445,12 @@ function SortieContent() {
             <div className="rounded-[28px] bg-[#EEF2F8] p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none">
-                  <path d="M4 20L0 16L4 12L5.4 13.45L3.85 15H14V11H16V17H3.85L5.4 18.55L4 20ZM2 9V3H14.15L12.6 1.45L14 0L18 4L14 8L12.6 6.55L14.15 5H4V9H2Z" fill="#152646" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M1 4V10H7" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M23 20V14H17" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M20.49 8.99995C19.9828 7.56674 19.1209 6.28536 17.9845 5.27537C16.8482 4.26539 15.4745 3.55972 13.9917 3.22421C12.5089 2.8887 10.9652 2.93429 9.50481 3.35673C8.04437 3.77916 6.71475 4.56467 5.64 5.63995L1 9.99995M23 14L18.36 18.36C17.2853 19.4352 15.9556 20.2207 14.4952 20.6432C13.0348 21.0656 11.4911 21.1112 10.0083 20.7757C8.52547 20.4402 7.1518 19.7345 6.01547 18.7245C4.87913 17.7145 4.01717 16.4332 3.51 15" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <label className="text-sm font-semibold text-[#001A0E]">
+                <label className="text-sm font-demibold text-[#001A0E]">
                   Rendre cette sortie récurrente
                 </label>
                 </div>
@@ -476,7 +476,7 @@ function SortieContent() {
         </form>
 
         {/* BOUTON ENVOYER (rond, en bas à droite) */}
-<div className="absolute bottom-6 left-1/2 -translate-x-1/2">
+<div className="absolute bottom-6 left-6 right-6">
   <button
     type="submit"
     form="sortie-form"
@@ -488,9 +488,9 @@ function SortieContent() {
       !time ||
       !location.trim()
     }
-    className="h-14 px-6 rounded-full bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold"
+    className="h-14 w-full rounded bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed text-sm font-demibold"
   >
-    {isLoading ? "..." : "Créer un évènement"}
+    {isLoading ? "..." : "Proposer la sortie"}
   </button>
 </div>
 
@@ -499,17 +499,18 @@ function SortieContent() {
             <div className="w-[90%] max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl">
 
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#C7D7F3]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 40 40" fill="none" >
-                  <path d="M17.2 29.2L31.3 15.1L28.5 12.3L17.2 23.6L11.5 17.9L8.7 20.7L17.2 29.2ZM20 40C17.2333 40 14.6333 39.475 12.2 38.425C9.76667 37.375 7.65 35.95 5.85 34.15C4.05 32.35 2.625 30.2333 1.575 27.8C0.525 25.3667 0 22.7667 0 20C0 17.2333 0.525 14.6333 1.575 12.2C2.625 9.76667 4.05 7.65 5.85 5.85C7.65 4.05 9.76667 2.625 12.2 1.575C14.6333 0.525 17.2333 0 20 0C22.7667 0 25.3667 0.525 27.8 1.575C30.2333 2.625 32.35 4.05 34.15 5.85C35.95 7.65 37.375 9.76667 38.425 12.2C39.475 14.6333 40 17.2333 40 20C40 22.7667 39.475 25.3667 38.425 27.8C37.375 30.2333 35.95 32.35 34.15 34.15C32.35 35.95 30.2333 37.375 27.8 38.425C25.3667 39.475 22.7667 40 20 40Z" fill="#152646" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+                <path d="M33 16.62V18C32.9982 21.2347 31.9508 24.3821 30.014 26.9728C28.0773 29.5635 25.3549 31.4588 22.253 32.3759C19.1511 33.293 15.8359 33.1829 12.8017 32.0619C9.76752 30.9409 7.17698 28.8692 5.41644 26.1556C3.6559 23.4421 2.81969 20.2321 3.03252 17.0045C3.24534 13.7769 4.49581 10.7045 6.59742 8.24565C8.69903 5.78677 11.5392 4.07311 14.6943 3.36026C17.8494 2.64741 21.1504 2.97355 24.105 4.29004" stroke="#152646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M33 6L18 21.015L13.5 16.515" stroke="#152646" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
               </div>
               
 
-              <h2 className="text-lg font-semibold text-[#001A0E]">
+              <h2 className="text-lg font-bold text-[#001A0E]">
                 {isEditMode ? "Sortie modifiée !" : "Évènement créé !"}
               </h2>
 
-              <p className="mt-2 text-small text-zinc-500">
+              <p className="mt-2 text-small text-zinc-500 font-medium">
                 {isEditMode ? "Votre sortie a été modifiée avec succès. Préparez-vous pour un moment convivial !" : "Votre sortie a été créée avec succès. Préparez-vous pour un moment convivial !"}
               </p>
 

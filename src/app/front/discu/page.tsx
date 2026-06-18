@@ -133,26 +133,22 @@ export default function DiscussionPage() {
             className="flex-1 flex flex-col items-center justify-center gap-[4px] cursor-pointer"
             onClick={() => router.push("/front/membre")}
           >
-            <div className="flex -space-x-3">
+            <div className="relative w-[72px] h-[52px]">
               {members.slice(0, 3).map((m, i) => (
-                m.avatarUrl ? (
-                  <img
-                    key={m.id}
-                    src={m.avatarUrl}
-                    alt={`${m.firstName} ${m.lastName}`}
-                    className={`w-8 h-8 rounded-full border-2 border-white object-cover ${["z-30", "z-20", "z-10"][i]}`}
-                  />
-                ) : (
-                  <img
-                    key={m.id}
-                    src="/pdp.png"
-                    alt={`${m.firstName} ${m.lastName}`}
-                    className={`w-8 h-8 rounded-full border-2 border-white object-cover ${["z-30", "z-20", "z-10"][i]}`}
-                  />
-                )
+                <img
+                  key={m.id}
+                  src={m.avatarUrl ?? "/pdp.png"}
+                  alt={`${m.firstName} ${m.lastName}`}
+                  className="w-8 h-8 rounded-full border-2 border-white object-cover absolute"
+                  style={
+                    i === 0 ? { top: 0, left: 0 } :
+                    i === 1 ? { top: 0, right: 0 } :
+                    { bottom: 0, left: "50%", transform: "translateX(-50%)" }
+                  }
+                />
               ))}
             </div>
-            <h1 className="text-[20px] font-bold text-[#001A0E] leading-[28px] tracking-[-0.5px] truncate">
+            <h1 className="text-[20px] font-bold text-[#001A0E] leading-[28px] tracking-[-0.5px] truncate font-bold">
               {groupName ?? "..."}
             </h1>
           </div>
@@ -160,7 +156,7 @@ export default function DiscussionPage() {
           {/* Bouton profil — droite */}
           <button
             onClick={() => router.push("/front/profil")}
-            className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-[#E3EBF9] flex-shrink-0 overflow-hidden"
+            className="flex items-center justify-center w-[40px] h-[40px] rounded bg-[#E3EBF9] flex-shrink-0 overflow-hidden"
           >
             {members.find((m) => m.id === myUserId)?.avatarUrl ? (
               <img
@@ -185,12 +181,12 @@ export default function DiscussionPage() {
                 <h2 className="text-[18px] font-bold leading-normal">
                   Bienvenue dans le groupe !
                 </h2>
-                <p className="text-[14px] leading-normal text-[#001A0E]">
+                <p className="text-[14px] leading-normal text-[#001A0E] font-medium">
                   Ce groupe réunit des personnes que vous avez peut-être déjà croisées ici.
                 </p> 
               </div>
               <div className="w-full flex flex-col gap-[16px] items-start">
-                <p className="text-[16px] font-semibold text-[#001A0E] text-center w-full leading-normal">
+                <p className="text-[16px] font-demibold text-[#001A0E] text-center w-full leading-normal">
                   Pour commencer, vous pouvez proposer un moment ensemble
                 </p>
                 <button
@@ -207,7 +203,7 @@ export default function DiscussionPage() {
           </div>
 
           {/* Infos système — text-[14px], text-[#424843] */}
-          <div className="text-center text-[14px] text-[#424843] leading-normal">
+          <div className="text-center text-[14px] text-[#424843] leading-normal font-medium">
             Groupe modéré pour garantir la sécurité de tous.
           </div>
 
@@ -249,13 +245,16 @@ export default function DiscussionPage() {
             onClick={() => router.push("/front/sorti")}
             className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] hover:opacity-70 transition cursor-pointer flex-shrink-0"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="20" viewBox="0 0 19 20" fill="none">
-              <path fillRule="evenodd" clipRule="evenodd" d="M14 17V20H16V17H19V15H16V12H14V15H11V17H14ZM0.5875 17.4125C0.979167 17.8042 1.45 18 2 18H9V16H2V8H14V10.025H16V4C16 3.45 15.8042 2.97917 15.4125 2.5875C15.0208 2.19583 14.55 2 14 2H13V0H11V2H5V0H3V2H2C1.45 2 0.979167 2.19583 0.5875 2.5875C0.195833 2.97917 0 3.45 0 4V16C0 16.55 0.195833 17.0208 0.5875 17.4125ZM14 6H2V4H14V6Z" fill="#152646"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 2V6" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 2V6" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 10H21" stroke="#152646" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg> 
           </button>
  
           <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-[12px]">
-            <div className="bg-[#EFEEEA] rounded-full px-[24px] py-[16px] flex-1">
+            <div className="bg-[#C7D7F34D] rounded px-[24px] py-[16px] flex-1">
               <input
                 type="text"
                 value={newMessage}
@@ -267,7 +266,7 @@ export default function DiscussionPage() {
             <button
               type="submit"
               disabled={!newMessage.trim() || !groupId}
-              className="w-[52px] h-[52px] rounded-full bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center flex-shrink-0 cursor-pointer disabled:opacity-50"
+              className="w-[52px] h-[52px] rounded bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center flex-shrink-0 cursor-pointer disabled:opacity-50"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="19" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[2px]">
                 <line x1="22" y1="2" x2="11" y2="13" />
