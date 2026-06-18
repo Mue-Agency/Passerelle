@@ -12,11 +12,8 @@ declare global {
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  // Source principale : cookie httpOnly. Fallback Bearer transitoire (rollout) — à retirer ensuite.
-  const cookieToken = req.cookies?.[SESSION_COOKIE] as string | undefined;
-  const header = req.headers.authorization;
-  const bearerToken = header?.startsWith("Bearer ") ? header.slice(7) : undefined;
-  const token = cookieToken ?? bearerToken;
+  // Auth via cookie httpOnly uniquement.
+  const token = req.cookies?.[SESSION_COOKIE] as string | undefined;
 
   if (!token) {
     res.status(401).json({ error: "Non authentifié." });

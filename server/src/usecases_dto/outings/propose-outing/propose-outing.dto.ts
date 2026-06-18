@@ -3,12 +3,12 @@ import { z } from "zod";
 export const ProposeOutingDtoIn = z.object({
   groupId:     z.string().min(1),
   userId:      z.string().min(1),
-  title:       z.string().min(1),
+  title:       z.string().min(1).max(120),
   date:        z.string().min(1),
-  location:    z.string().min(1),
-  maxSpots:    z.number().int().positive().optional(),
+  location:    z.string().min(1).max(120),
+  maxSpots:    z.number().int().positive().max(1000).optional(),
   recurring:   z.boolean().optional(),
-  pollOptions: z.array(z.string().min(1)).optional(),
+  pollOptions: z.array(z.string().min(1).max(120)).max(20).optional(),
 });
 
 export type ProposeOutingDtoIn = z.output<typeof ProposeOutingDtoIn>;

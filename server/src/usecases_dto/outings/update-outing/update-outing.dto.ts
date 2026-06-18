@@ -3,10 +3,10 @@ import { z } from "zod";
 export const UpdateOutingDtoIn = z.object({
   outingId: z.string().min(1),
   userId:   z.string().min(1),
-  title:    z.string().min(1),
+  title:    z.string().min(1).max(120),
   date:     z.string().min(1),
-  location: z.string().min(1),
-  maxSpots: z.number().int().positive(),
+  location: z.string().min(1).max(120),
+  maxSpots: z.number().int().positive().max(1000),
 });
 
 export type UpdateOutingDtoIn = z.output<typeof UpdateOutingDtoIn>;

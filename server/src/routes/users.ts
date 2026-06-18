@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from "../lib/authMiddleware";
-import { getMe, updateProfile, UpdateProfileDtoIn, getProfile, uploadAvatar } from "../usecases_dto/users";
+import { getMe, updateProfile, UpdateProfileDtoIn, getProfile, uploadAvatar, MAX_AVATAR_SIZE } from "../usecases_dto/users";
 
 export const usersRouter = Router();
 
@@ -40,7 +40,15 @@ usersRouter.patch("/me", requireAuth, async (req, res) => {
 
 usersRouter.post("/me/avatar", requireAuth, async (req, res) => {
   const chunks: Buffer[] = [];
+  let receivedBytes = 0;
   for await (const chunk of req) {
+    receivedBytes += chunk.length;
+    // Coupe la lecture dès le dépassement : évite d'agréger un corps illimité en mémoire (DoS).
+    if (receivedBytes > MAX_AVATAR_SIZE) {
+      req.destroy();
+      res.status(413).json({ error: "Image trop volumineuse (2 Mo max)." });
+      return;
+    }
     chunks.push(chunk);
   }
 

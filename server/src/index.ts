@@ -8,7 +8,6 @@ import { parse as parseCookie } from "cookie";
 import { verifyToken } from "./lib/auth";
 import { SESSION_COOKIE } from "./lib/cookies";
 import { prisma } from "./lib/prisma";
-import { configRouter } from "./routes/config";
 import { authRouter } from "./routes/auth";
 import { usersRouter } from "./routes/users";
 import { groupsRouter } from "./routes/groups";
@@ -48,7 +47,6 @@ app.get("/", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/api/config", configRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/groups", groupsRouter);
@@ -58,11 +56,9 @@ app.use("/api/outings", outingsRouter);
 app.use(errorMapper);
 
 io.use((socket, next) => {
-  // Source principale : cookie httpOnly du handshake. Fallback auth.token transitoire (rollout).
+  // Auth via cookie httpOnly du handshake uniquement.
   const cookies = parseCookie(socket.handshake.headers.cookie ?? "");
-  const cookieToken = cookies[SESSION_COOKIE];
-  const authToken = socket.handshake.auth.token as string | undefined;
-  const token = cookieToken ?? authToken;
+  const token = cookies[SESSION_COOKIE];
   if (!token) return next(new Error("Non authentifié."));
 
   const userId = verifyToken(token);

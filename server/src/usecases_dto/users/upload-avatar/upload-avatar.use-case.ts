@@ -1,34 +1,39 @@
 import path from "path";
-import fs from "fs";
+import { writeFile, mkdir, readdir, unlink } from "fs/promises";
 import { fromBuffer } from "file-type";
 import { prisma } from "../../../lib/prisma";
 import type { UploadAvatarDtoIn, UploadAvatarDtoOut } from "./upload-avatar.dto";
 
 const UPLOADS_DIR = path.resolve(__dirname, "../../../../uploads");
 const ALLOWED_MIMES = ["image/png", "image/jpeg", "image/webp"];
-const MAX_SIZE = 2 * 1024 * 1024;
+export const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 
 export async function uploadAvatar(
   dto: UploadAvatarDtoIn,
   buffer: Buffer,
 ): Promise<UploadAvatarDtoOut> {
-  if (buffer.length > MAX_SIZE) {
+  if (buffer.length > MAX_AVATAR_SIZE) {
     throw new Error("FILE_TOO_LARGE");
   }
 
-  const fileTypeResult = await fromBuffer(buffer);
-  if (!fileTypeResult || !ALLOWED_MIMES.includes(fileTypeResult.mime)) {
+  const fileType = await fromBuffer(buffer);
+  if (!fileType || !ALLOWED_MIMES.includes(fileType.mime)) {
     throw new Error("INVALID_FILE_TYPE");
   }
 
-  const filename = `${dto.userId}.${fileTypeResult.ext}`;
-  const filepath = path.join(UPLOADS_DIR, filename);
+  await mkdir(UPLOADS_DIR, { recursive: true });
 
-  if (!fs.existsSync(UPLOADS_DIR)) {
-    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-  }
+  const filename = `${dto.userId}.${fileType.ext}`;
 
-  fs.writeFileSync(filepath, buffer);
+  // Supprime un éventuel avatar précédent d'extension différente (sinon fichier orphelin).
+  const existingFiles = await readdir(UPLOADS_DIR);
+  await Promise.all(
+    existingFiles
+      .filter((name) => name.startsWith(`${dto.userId}.`) && name !== filename)
+      .map((name) => unlink(path.join(UPLOADS_DIR, name))),
+  );
+
+  await writeFile(path.join(UPLOADS_DIR, filename), buffer);
 
   const avatarUrl = `/uploads/${filename}`;
   await prisma.user.update({
