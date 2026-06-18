@@ -9,6 +9,22 @@ type UserProfile = {
   createdAt?: string;
 };
 
+export type ProfileActivity = {
+  type: "JOIN" | "PARTICIPATION" | "PROPOSED";
+  label: string;
+  date: string;
+};
+
+export type MemberProfile = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  interests: string[];
+  createdAt: string;
+  activity: ProfileActivity[];
+};
+
 type UpdateProfileInput = {
   firstName?: string;
   lastName?: string;
@@ -18,6 +34,10 @@ type UpdateProfileInput = {
 export const usersService = {
   getMe() {
     return request<{ exists: boolean; user: UserProfile }>("/api/users/me");
+  },
+
+  getProfile(memberId: string) {
+    return request<MemberProfile>(`/api/users/${memberId}/profile`);
   },
 
   updateProfile(input: UpdateProfileInput) {

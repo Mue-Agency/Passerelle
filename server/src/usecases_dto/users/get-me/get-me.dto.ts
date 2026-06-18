@@ -12,6 +12,7 @@ export const GetMeDtoOut = z.object({
   lastName:  z.string(),
   avatarUrl: z.string().nullable(),
   interests: z.array(z.string()),
+  createdAt: z.date(),
 });
 
 export type GetMeDtoOut = z.output<typeof GetMeDtoOut>;
