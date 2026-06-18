@@ -106,7 +106,7 @@ export default function ConnexionPage() {
 
           <p className="text-sm text-[#424843] text-center">
             Pas encore de compte ?{" "}
-            <Link href="/inscription" className="text-[#426200] font-medium hover:underline">
+            <Link href="/inscription" className="text-[#152646] font-medium hover:underline">
               Créer un compte admin
             </Link>
           </p>

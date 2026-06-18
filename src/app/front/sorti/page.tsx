@@ -37,7 +37,9 @@ function SortieContent() {
   const searchParams = useSearchParams();
   const outingId = searchParams.get("outingId");
 
-  const [groupId, setGroupId] = useState<string | null>(null);
+  const [groupId] = useState<string | null>(
+    () => (typeof window !== "undefined" ? localStorage.getItem("groupId") : null),
+  );
   const [groupName, setGroupName] = useState<string | null>(null);
   const [lieu, setLieu] = useState<string | null>(null);
   const [title, setTitle] = useState("");
@@ -56,16 +58,14 @@ function SortieContent() {
   const suggestionDate = getNextSuggestionDate();
 
   useEffect(() => {
-    const storedGroupId = localStorage.getItem("groupId");
-    if (!storedGroupId) return;
-    setGroupId(storedGroupId);
+    if (!groupId) return;
 
-    groupsService.getGroup(storedGroupId).then((result) => {
+    groupsService.getGroup(groupId).then((result) => {
       if (!result.isOk) return;
       setGroupName(result.data.name);
       setLieu(result.data.lieu);
     });
-  }, []);
+  }, [groupId]);
 
   useEffect(() => {
     if (!outingId) return;
@@ -168,6 +168,7 @@ function SortieContent() {
           <button
             type="button"
             onClick={() => router.back()}
+            aria-label="Retour"
             className="p-1 text-[#001A0E] hover:opacity-70 transition cursor-pointer"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -214,6 +215,7 @@ function SortieContent() {
                 <button
                   type="button"
                   onClick={applySuggestion}
+                  aria-label="Appliquer la suggestion"
                   className="w-10 h-10 rounded-full bg-[#152646] text-white flex items-center justify-center flex-shrink-0 hover:opacity-90 transition cursor-pointer"
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -233,7 +235,7 @@ function SortieContent() {
               </label>
               <div className="flex items-center gap-3 bg-[#E3EBF9] border border-zinc-200/50 rounded-xl px-4 py-3.5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <path d="M11 1L14.09 7.26L21 8.27L16 13.14L17.18 20.02L11 16.77L4.82 20.02L6 13.14L1 8.27L7.91 7.26L11 1Z" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 1L14.09 7.26L21 8.27L16 13.14L17.18 20.02L11 16.77L4.82 20.02L6 13.14L1 8.27L7.91 7.26L11 1Z" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <input
                   type="text"
@@ -277,7 +279,7 @@ function SortieContent() {
             </div>
 
             {/* Lieu */}
-            {/* <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-bold text-[#001A0E] pl-1">
                 Lieu
               </label>
@@ -294,7 +296,7 @@ function SortieContent() {
                   className="w-full bg-transparent outline-none text-sm text-[#001A0E] placeholder-zinc-400"
                 />
               </div>
-            </div> */}
+            </div>
 
             {/* Sondage Horaires */}
             <div className="rounded-[28px] bg-[#EEF2F8] p-6">
@@ -323,6 +325,8 @@ function SortieContent() {
                 <button
                   type="button"
                   onClick={() => setPollEnabled((v) => !v)}
+                  aria-label="Activer le sondage d'horaires"
+                  aria-pressed={pollEnabled}
                   className={`relative w-[48px] h-[28px] rounded-full transition-colors duration-200 cursor-pointer flex-shrink-0 ${
                     pollEnabled ? "bg-[#152646]" : "bg-zinc-300"
                   }`}
@@ -366,13 +370,14 @@ function SortieContent() {
                       <button
                         type="button"
                         onClick={() => setPollSlots((prev) => prev.filter((_, j) => j !== i))}
+                        aria-label="Supprimer ce créneau"
                         className="w-7 h-7 flex items-center justify-center  text-zinc-400 hover:bg-zinc-100 transition cursor-pointer flex-shrink-0"
                       >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M3 6H5H21" stroke="#D20787" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#D20787" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M10 11V17" stroke="#D20787" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M14 11V17" stroke="#D20787" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M3 6H5H21" stroke="#D20787" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#D20787" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M10 11V17" stroke="#D20787" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M14 11V17" stroke="#D20787" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>                    
                     </button>
                     )}
@@ -446,11 +451,11 @@ function SortieContent() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M1 4V10H7" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M23 20V14H17" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M20.49 8.99995C19.9828 7.56674 19.1209 6.28536 17.9845 5.27537C16.8482 4.26539 15.4745 3.55972 13.9917 3.22421C12.5089 2.8887 10.9652 2.93429 9.50481 3.35673C8.04437 3.77916 6.71475 4.56467 5.64 5.63995L1 9.99995M23 14L18.36 18.36C17.2853 19.4352 15.9556 20.2207 14.4952 20.6432C13.0348 21.0656 11.4911 21.1112 10.0083 20.7757C8.52547 20.4402 7.1518 19.7345 6.01547 18.7245C4.87913 17.7145 4.01717 16.4332 3.51 15" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 4V10H7" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M23 20V14H17" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20.49 8.99995C19.9828 7.56674 19.1209 6.28536 17.9845 5.27537C16.8482 4.26539 15.4745 3.55972 13.9917 3.22421C12.5089 2.8887 10.9652 2.93429 9.50481 3.35673C8.04437 3.77916 6.71475 4.56467 5.64 5.63995L1 9.99995M23 14L18.36 18.36C17.2853 19.4352 15.9556 20.2207 14.4952 20.6432C13.0348 21.0656 11.4911 21.1112 10.0083 20.7757C8.52547 20.4402 7.1518 19.7345 6.01547 18.7245C4.87913 17.7145 4.01717 16.4332 3.51 15" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <label className="text-sm font-demibold text-[#001A0E]">
+                <label className="text-sm font-semibold text-[#001A0E]">
                   Rendre cette sortie récurrente
                 </label>
                 </div>
@@ -458,6 +463,8 @@ function SortieContent() {
                 <button
                   type="button"
                   onClick={() => setRecurringEnabled((v) => !v)}
+                  aria-label="Rendre la sortie récurrente"
+                  aria-pressed={recurringEnabled}
                   className={`relative w-[48px] h-[28px] rounded-full transition-colors duration-200 cursor-pointer flex-shrink-0 ${
                     recurringEnabled ? "bg-[#152646]" : "bg-zinc-300"
                   }`}
@@ -488,7 +495,7 @@ function SortieContent() {
       !time ||
       !location.trim()
     }
-    className="h-14 w-full rounded bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed text-sm font-demibold"
+    className="h-14 w-full rounded bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold"
   >
     {isLoading ? "..." : "Proposer la sortie"}
   </button>
@@ -500,8 +507,8 @@ function SortieContent() {
 
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#C7D7F3]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <path d="M33 16.62V18C32.9982 21.2347 31.9508 24.3821 30.014 26.9728C28.0773 29.5635 25.3549 31.4588 22.253 32.3759C19.1511 33.293 15.8359 33.1829 12.8017 32.0619C9.76752 30.9409 7.17698 28.8692 5.41644 26.1556C3.6559 23.4421 2.81969 20.2321 3.03252 17.0045C3.24534 13.7769 4.49581 10.7045 6.59742 8.24565C8.69903 5.78677 11.5392 4.07311 14.6943 3.36026C17.8494 2.64741 21.1504 2.97355 24.105 4.29004" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M33 6L18 21.015L13.5 16.515" stroke="#152646" strokeWidth="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M33 16.62V18C32.9982 21.2347 31.9508 24.3821 30.014 26.9728C28.0773 29.5635 25.3549 31.4588 22.253 32.3759C19.1511 33.293 15.8359 33.1829 12.8017 32.0619C9.76752 30.9409 7.17698 28.8692 5.41644 26.1556C3.6559 23.4421 2.81969 20.2321 3.03252 17.0045C3.24534 13.7769 4.49581 10.7045 6.59742 8.24565C8.69903 5.78677 11.5392 4.07311 14.6943 3.36026C17.8494 2.64741 21.1504 2.97355 24.105 4.29004" stroke="#152646" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M33 6L18 21.015L13.5 16.515" stroke="#152646" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               </div>
               
@@ -510,7 +517,7 @@ function SortieContent() {
                 {isEditMode ? "Sortie modifiée !" : "Évènement créé !"}
               </h2>
 
-              <p className="mt-2 text-small text-zinc-500 font-medium">
+              <p className="mt-2 text-sm text-zinc-500 font-medium">
                 {isEditMode ? "Votre sortie a été modifiée avec succès. Préparez-vous pour un moment convivial !" : "Votre sortie a été créée avec succès. Préparez-vous pour un moment convivial !"}
               </p>
 
@@ -536,7 +543,7 @@ function SortieContent() {
                 className="mt-6 w-full rounded-lg bg-[#152646] px-4 py-3 text-sm font-medium text-white hover:opacity-90 transition cursor-pointer flex items-center justify-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 Retour au Chat 
               </button>

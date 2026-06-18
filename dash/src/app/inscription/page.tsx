@@ -147,7 +147,7 @@ export default function InscriptionPage() {
 
           <p className="text-sm text-[#424843] text-center">
             Déjà un compte ?{" "}
-            <Link href="/connexion" className="text-[#426200] font-medium hover:underline">
+            <Link href="/connexion" className="text-[#152646] font-medium hover:underline">
               Se connecter
             </Link>
           </p>

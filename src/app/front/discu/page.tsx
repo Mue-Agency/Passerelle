@@ -37,9 +37,13 @@ export default function DiscussionPage() {
   const isAtBottomRef = useRef(true);
   const prevMessageCountRef = useRef(0);
 
-  const [groupId, setGroupId] = useState<string | null>(null);
+  const [groupId] = useState<string | null>(
+    () => (typeof window !== "undefined" ? localStorage.getItem("groupId") : null),
+  );
   const [groupName, setGroupName] = useState<string | null>(null);
-  const [myUserId, setMyUserId] = useState<string | null>(null);
+  const [myUserId] = useState<string | null>(
+    () => (typeof window !== "undefined" ? localStorage.getItem("userId") : null),
+  );
   const [members, setMembers] = useState<{ id: string; firstName: string; lastName: string; avatarUrl: string | null }[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sendError, setSendError] = useState("");
@@ -53,20 +57,16 @@ export default function DiscussionPage() {
   }, []);
 
   useEffect(() => {
-    setMyUserId(localStorage.getItem("userId"));
+    if (!groupId) return;
 
-    const storedGroupId = localStorage.getItem("groupId");
-    if (!storedGroupId) return;
-    setGroupId(storedGroupId);
-
-    groupsService.getGroup(storedGroupId).then((result) => {
+    groupsService.getGroup(groupId).then((result) => {
       if (result.isOk) setGroupName(result.data.name);
     });
 
-    groupsService.getGroupMembers(storedGroupId).then((result) => {
+    groupsService.getGroupMembers(groupId).then((result) => {
       if (result.isOk) setMembers(result.data.members);
     });
-  }, []);
+  }, [groupId]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -118,7 +118,6 @@ export default function DiscussionPage() {
   if (!isReady) return null;
 
   return (
-    // <div className="w-full h-dvh flex justify-center bg-[#FAF9F5] font-sans overflow-hidden">
       <div className="w-full h-dvh flex justify-center overflow-hidden font-sans bg-gradient-to-t from-pink-200/40 via-pink-100/20 to-[#FAF9F5]">
       <main className="flex w-full max-w-md h-full flex-col relative">
 
@@ -148,7 +147,7 @@ export default function DiscussionPage() {
                 />
               ))}
             </div>
-            <h1 className="text-[20px] font-bold text-[#001A0E] leading-[28px] tracking-[-0.5px] truncate font-bold">
+            <h1 className="text-[20px] font-bold text-[#001A0E] leading-[28px] tracking-[-0.5px] truncate">
               {groupName ?? "..."}
             </h1>
           </div>
@@ -156,6 +155,7 @@ export default function DiscussionPage() {
           {/* Bouton profil — droite */}
           <button
             onClick={() => router.push("/front/profil")}
+            aria-label="Mon profil"
             className="flex items-center justify-center w-[40px] h-[40px] rounded bg-[#E3EBF9] flex-shrink-0 overflow-hidden"
           >
             {members.find((m) => m.id === myUserId)?.avatarUrl ? (
@@ -186,7 +186,7 @@ export default function DiscussionPage() {
                 </p> 
               </div>
               <div className="w-full flex flex-col gap-[16px] items-start">
-                <p className="text-[16px] font-demibold text-[#001A0E] text-center w-full leading-normal">
+                <p className="text-[16px] font-semibold text-[#001A0E] text-center w-full leading-normal">
                   Pour commencer, vous pouvez proposer un moment ensemble
                 </p>
                 <button
@@ -229,7 +229,7 @@ export default function DiscussionPage() {
         {unreadCount > 0 && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-[100px] left-1/2 -translate-x-1/2 z-20 flex items-center gap-[6px] bg-[#E3EBF9] text-white text-[13px] font-semibold px-[14px] py-[7px] rounded-full shadow-lg hover:opacity-90 transition cursor-pointer"
+            className="absolute bottom-[100px] left-1/2 -translate-x-1/2 z-20 flex items-center gap-[6px] bg-[#152646] text-white text-[13px] font-semibold px-[14px] py-[7px] rounded-full shadow-lg hover:opacity-90 transition cursor-pointer"
           >
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M6 2v8M2 6l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -243,13 +243,14 @@ export default function DiscussionPage() {
           <button
             type="button"
             onClick={() => router.push("/front/sorti")}
+            aria-label="Proposer une sortie"
             className="w-[35px] h-[36px] flex items-center justify-center text-[#424843] hover:opacity-70 transition cursor-pointer flex-shrink-0"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M16 2V6" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 2V6" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M3 10H21" stroke="#152646" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16 2V6" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 2V6" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 10H21" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg> 
           </button>
  
@@ -266,6 +267,7 @@ export default function DiscussionPage() {
             <button
               type="submit"
               disabled={!newMessage.trim() || !groupId}
+              aria-label="Envoyer le message"
               className="w-[52px] h-[52px] rounded bg-[#152646] text-white hover:opacity-90 transition flex items-center justify-center flex-shrink-0 cursor-pointer disabled:opacity-50"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="19" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="translate-x-[2px]">
@@ -317,49 +319,9 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
   );
 }
 
-/* ─── SpotsIndicator — dots 12x12, gap-[8px] ─── */
-    function SpotsIndicator({
-      participantCount,
-      participantCountrefused,
-      maxSpots,
-      isMe,
-      onClick,
-    }: {
-      participantCount: number;
-      participantCountrefused: number;
-      
-      maxSpots: number;
-      isMe: boolean;
-      onClick?: () => void;
-    }) {
-      return (
-        <button
-          type="button"
-          onClick={onClick}
-          className="flex items-center gap-[8px] cursor-pointer"
-        >
-          {Array.from({ length: maxSpots }, (_, i) => (
-            <span
-              key={i}
-              className={`w-[12px] h-[12px] rounded-full ${
-                i < participantCount
-                  ? isMe
-                    ? "bg-white"
-                    : "bg-[#426200]"
-                  : isMe
-                  ? "border-2 border-white/50"
-                  : "border-2 border-[#C1C8C1]"
-              }`}
-            />
-          ))}
-        </button>
-      );
-    }
-
 /* ─── OutingCard ─── */
     function OutingCard({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: boolean; myUserId: string | null; members: { id: string; firstName: string; lastName: string; avatarUrl: string | null }[] }) {
       const router = useRouter();
-      const [isActing, setIsActing] = useState(false);
       const [showParticipants, setShowParticipants] = useState(false);
       const [hasJoined, setHasJoined] = useState(msg.outing?.isParticipant ?? false);
       const [hasRefused, setHasRefused] = useState(false);
@@ -368,9 +330,10 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
 
       const currentUser = myUserId ? members.find((m) => m.id === myUserId) ?? null : null;
 
+      const outingId = msg.outing?.id;
       useEffect(() => {
-        if (!msg.outing) return;
-        outingsService.getOuting(msg.outing.id).then((result) => {
+        if (!outingId) return;
+        outingsService.getOuting(outingId).then((result) => {
           if (!result.isOk) return;
           setParticipants(result.data.participants);
           setHasJoined(result.data.isParticipant);
@@ -381,11 +344,10 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
             }
           }
         });
-      }, [msg.outing?.id]);
+      }, [outingId, myUserId]);
 
       if (!msg.outing) return null;
       const { outing } = msg;
-      const spotsLeft = outing.maxSpots - outing.participantCount;
 
       async function handleJoin() {
         setHasJoined(true);
@@ -396,9 +358,8 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
           );
           setRefusedParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
-        try {
-          await outingsService.joinOuting(outing.id);
-        } catch {
+        const result = await outingsService.joinOuting(outing.id);
+        if (!result.isOk) {
           setHasJoined(false);
           if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
@@ -407,9 +368,8 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
       async function handleLeave() {
         setHasJoined(false);
         if (currentUser) setParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
-        try {
-          await outingsService.leaveOuting(outing.id);
-        } catch {
+        const result = await outingsService.leaveOuting(outing.id);
+        if (!result.isOk) {
           setHasJoined(true);
           if (currentUser) setParticipants((prev) => [...prev, currentUser]);
         }
@@ -424,9 +384,8 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
             prev.some((p) => p.id === currentUser.id) ? prev : [...prev, currentUser]
           );
         }
-        try {
-          await outingsService.refuseOuting(outing.id);
-        } catch {
+        const result = await outingsService.refuseOuting(outing.id);
+        if (!result.isOk) {
           setHasRefused(false);
           if (currentUser) setRefusedParticipants((prev) => prev.filter((p) => p.id !== currentUser.id));
         }
@@ -438,10 +397,6 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
         day: "2-digit",
         month: "2-digit",
       });
-    }
-
-    function AuthorName(user: MessageOut["user"]): string {
-      return `${user.firstName} ${user.lastName.charAt(0)}.`;
     }
 
   return (
@@ -470,14 +425,6 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
             <p className={`text-[14px] leading-normal ${isMe ? "text-white/70" : "text-[#424843]"}`}>
               Places : {outing.participantCount}/{outing.maxSpots}
             </p>
-            {/* <SpotsIndicator participantCount={outing.participantCount} maxSpots={outing.maxSpots} isMe={isMe} /> */}
-            {/* <SpotsIndicator
-              participantCount={outing.participantCount}
-              participantCountrefused={outing.participantCountrefused}
-              maxSpots={outing.maxSpots}
-              isMe={isMe}
-              onClick={() => setShowParticipants(true)}
-            /> */}
            </div>
           <button
             type="button"
@@ -568,7 +515,7 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                 <p className="text-[16px] font-semibold text-[#001A0E]">{outing.title}</p>
                 <p className="text-[13px] text-[#727973]">{formatShortDate(outing.date)}</p>
               </div>
-              <button type="button" onClick={() => setShowParticipants(false)} className="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-zinc-100 text-[#727973] cursor-pointer hover:opacity-70 transition">
+              <button type="button" onClick={() => setShowParticipants(false)} aria-label="Fermer" className="w-[32px] h-[32px] flex items-center justify-center rounded-full bg-zinc-100 text-[#727973] cursor-pointer hover:opacity-70 transition">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
@@ -586,7 +533,7 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                   <span className="text-[14px] font-semibold text-[#426200]">Acceptés · {participants.length}</span>
                 </div>
                 {participants.length === 0 ? (
-                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun participant pour l'instant</p>
+                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun participant pour l&apos;instant</p>
                 ) : (
                   <div className="flex flex-col gap-[8px]">
                     {participants.map((p) => (
@@ -608,7 +555,7 @@ function MessageItem({ msg, isMe, myUserId, members }: { msg: MessageOut; isMe: 
                   <span className="text-[14px] font-semibold text-[#727973]">Refusés · {refusedParticipants.length}</span>
                 </div>
                 {refusedParticipants.length === 0 ? (
-                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun refus pour l'instant</p>
+                  <p className="text-[13px] text-[#727973] pl-[32px]">Aucun refus pour l&apos;instant</p>
                 ) : (
                   <div className="flex flex-col gap-[8px]">
                     {refusedParticipants.map((p) => {

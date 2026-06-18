@@ -68,7 +68,7 @@ function QrModal({ group, onClose }: { group: Group; onClose: () => void }) {
         </p>
         <button
           onClick={handleDownload}
-          className="w-full rounded-xl border-2 border-[#426200] px-4 py-3 text-sm font-semibold text-[#426200] hover:bg-[#426200]/5 transition cursor-pointer flex items-center justify-center gap-2"
+          className="w-full rounded-xl border-2 border-[#152646] px-4 py-3 text-sm font-semibold text-[#152646] hover:bg-[#152646]/5 transition cursor-pointer flex items-center justify-center gap-2"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -183,7 +183,7 @@ export default function DashboardPage() {
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="w-full flex items-center justify-center gap-3 border-2 border-[#426200] rounded-xl px-6 py-3 text-base font-semibold text-[#426200] hover:bg-[#426200]/5 transition cursor-pointer mb-8"
+            className="w-full flex items-center justify-center gap-3 border-2 border-[#152646] rounded-xl px-6 py-3 text-base font-semibold text-[#152646] hover:bg-[#152646]/5 transition cursor-pointer mb-8"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M7 0v14M0 7h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
@@ -341,7 +341,7 @@ export default function DashboardPage() {
                         selectedGroup?.id === group.id ? null : group,
                       )
                     }
-                    className="w-full flex items-center justify-center gap-2 border-2 border-[#426200] rounded-lg px-4 py-2.5 text-sm font-semibold text-[#426200] hover:bg-[#426200]/5 transition cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 border-2 border-[#152646] rounded-lg px-4 py-2.5 text-sm font-semibold text-[#152646] hover:bg-[#152646]/5 transition cursor-pointer"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>

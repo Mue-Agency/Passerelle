@@ -16,14 +16,15 @@ Plateforme de mise en relation locale. Dans un lieu physique (commerce, équipem
 8. [Référence de l'API](#référence-de-lapi)
 9. [Application citoyenne (front)](#application-citoyenne-front)
 10. [Tableau de bord (dash)](#tableau-de-bord-dash)
-11. [Couche service & conventions de code](#couche-service--conventions-de-code)
-12. [Sécurité](#sécurité)
-13. [Variables d'environnement](#variables-denvironnement)
-14. [Prérequis & installation](#prérequis--installation)
-15. [Base de données & migrations](#base-de-données--migrations)
-16. [Scripts](#scripts)
-17. [Build & déploiement](#build--déploiement)
-18. [Conventions de contribution](#conventions-de-contribution)
+11. [Architecture front (composants, état, routing)](#architecture-front-composants-état-routing)
+12. [Couche service & conventions de code](#couche-service--conventions-de-code)
+13. [Sécurité](#sécurité)
+14. [Variables d'environnement](#variables-denvironnement)
+15. [Prérequis & installation](#prérequis--installation)
+16. [Base de données & migrations](#base-de-données--migrations)
+17. [Scripts](#scripts)
+18. [Build & déploiement](#build--déploiement)
+19. [Conventions de contribution](#conventions-de-contribution)
 
 ---
 
@@ -287,6 +288,23 @@ Routes protégées par le proxy : `/front/discu`, `/front/sorti`. `userId`/`grou
 | `/dashboard` | Tableau de bord | Liste des groupes, création, génération/téléchargement du **QR code** d'adhésion |
 
 Le QR code encode `<NEXT_PUBLIC_CITIZEN_URL>/front?groupId=<id>` : le scan amène directement le citoyen sur le formulaire d'inscription du bon groupe. Route protégée par le proxy : `/dashboard`.
+
+## Architecture front (composants, état, routing)
+
+Les deux front-ends (citoyen et dash) partagent les mêmes principes.
+
+**Composants & vues** — une route = un fichier `page.tsx` (App Router). Chaque vue est un composant autonome qui co-localise ses sous-composants quand ils ne sont pas réutilisés ailleurs : `discu/page.tsx` contient `MessageItem` et `OutingCard`, `dashboard/page.tsx` contient `QrModal`. Pas de dossier `components/` partagé — la duplication entre les deux apps (ex. `_http.ts`) est **assumée**, car elles se déploient séparément.
+
+**État** — état local React + hooks, sans store global :
+- `useAuth()` — récupère l'identité via `GET /api/users/me` (cookie), redirige si non authentifié, expose `{ user, isReady }`.
+- `useMessages(groupId)` — charge l'historique puis fusionne les événements Socket.IO temps réel (déduplication par `id`), gère le `join`/`leave` du salon.
+- `localStorage` ne stocke que des données **non secrètes** (`userId`, `groupId`, `hasSeenWelcome`), lues en **init paresseux** (`useState(() => …)`) pour éviter tout `setState` synchrone au montage. L'identité fait toujours autorité côté cookie httpOnly.
+
+**Flux de données** — les pages n'appellent jamais `fetch` directement ; elles passent par `services/<domaine>.service.ts` qui renvoie un `Result<T>` discriminé. Pattern systématique : `const r = await service.x(); if (!r.isOk) { setError(r.error); return; }`.
+
+**Routing & garde** — `proxy.ts` (middleware Next) filtre les routes selon la présence/expiration du cookie de session (UX uniquement ; la vraie validation est côté API). Les pages lisant `useSearchParams` (`/front`, `/front/sorti`, `/front/user`) sont enveloppées dans `<Suspense>`.
+
+**Styles & a11y** — Tailwind CSS 4 en classes utilitaires inline avec valeurs arbitraires (`text-[20px]`, `bg-[#152646]`). Palette de marque : marine `#152646`, bleu clair `#E3EBF9`, fond `#FAF9F5`. Les boutons à icône seule portent un `aria-label`. Les avatars utilisent `<img>` natif (origine API dynamique ; règle `@next/next/no-img-element` désactivée volontairement).
 
 ## Couche service & conventions de code
 

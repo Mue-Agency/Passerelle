@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Alouette — Dashboard Mairie",
   description: "Dashboard d'administration pour la mairie",
+  icons: { icon: "/plume.svg" },
 };
 
 export default function RootLayout({
