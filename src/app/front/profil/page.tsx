@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { usersService } from "@/app/services/users.service";
-import { groupsService, OutingItem } from "@/app/services/groups.service";
+import { usersService, type ProfileActivity } from "@/app/services/users.service";
 import { useAuth } from "@/app/hooks/useAuth";
 import { Camera } from "lucide-react";
 
@@ -13,6 +12,7 @@ export default function ProfilPage() {
     const [prenom, setPrenom] = useState("");
     const [nom, setNom] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [avatarError, setAvatarError] = useState("");
@@ -21,47 +21,45 @@ export default function ProfilPage() {
     const [showInterestInput, setShowInterestInput] = useState(false);
     const [interestInput, setInterestInput] = useState("");
     const [interests, setInterests] = useState<string[]>([]);
-    const [myOutings, setMyOutings] = useState<OutingItem[]>([]);
+    const [activity, setActivity] = useState<ProfileActivity[]>([]);
 
     useEffect(() => {
-        usersService.getMe().then((result) => {
-            if (result.isOk) {
-                const u = result.data.user;
-                setPrenom(u.firstName);
-                setNom(u.lastName);
-                setInterests(u.interests);
-                setAvatarUrl(u.avatarUrl);
-                if (u.createdAt) {
-                    setMemberSince(new Date(u.createdAt).toLocaleDateString("fr-FR", { month: "long", year: "numeric" }));
-                }
-            }
-        });
+        usersService.getMe().then((meResponse) => {
+            if (!meResponse.isOk) return;
 
-        const gId = localStorage.getItem("groupId");
-        if (gId) {
-            groupsService.getGroupOutings(gId).then((result) => {
-                if (result.isOk) {
-                    setMyOutings(result.data.outings.filter((o) => o.isParticipant));
+            const currentUser = meResponse.data.user;
+            setPrenom(currentUser.firstName);
+            setNom(currentUser.lastName);
+            setInterests(currentUser.interests);
+            setAvatarUrl(currentUser.avatarUrl);
+            if (currentUser.createdAt) {
+                setMemberSince(new Date(currentUser.createdAt).toLocaleDateString("fr-FR", { month: "long", year: "numeric" }));
+            }
+
+            usersService.getProfile(currentUser.id).then((profileResponse) => {
+                if (profileResponse.isOk) {
+                    setActivity(profileResponse.data.activity);
                 }
             });
-        }
+        });
     }, []);
 
     async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) return;
         setAvatarError("");
-        const result = await usersService.uploadAvatar(file);
-        if (result.isOk) {
-            setAvatarUrl(result.data.avatarUrl);
+        const uploadResponse = await usersService.uploadAvatar(file);
+        if (uploadResponse.isOk) {
+            setAvatarUrl(uploadResponse.data.avatarUrl);
         } else {
-            setAvatarError(result.error);
+            setAvatarError(uploadResponse.error);
         }
     }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");
+        setSuccess("");
 
         if (!prenom.trim() || !nom.trim()) {
             setError("Veuillez remplir les deux champs.");
@@ -69,19 +67,21 @@ export default function ProfilPage() {
         }
 
         setIsLoading(true);
-        const result = await usersService.updateProfile({
+        const updateResponse = await usersService.updateProfile({
             firstName: prenom.trim(),
             lastName: nom.trim(),
             interests,
         });
         setIsLoading(false);
 
-        if (!result.isOk) {
-            setError(result.error);
+        if (!updateResponse.isOk) {
+            setError(updateResponse.error);
             return;
         }
 
-        router.push("/front/discu");
+        // On reste sur la page profil ; on resynchronise avec la réponse du serveur.
+        setInterests(updateResponse.data.interests);
+        setSuccess("Profil enregistré.");
     }
 
     function addInterest() {
@@ -211,16 +211,16 @@ export default function ProfilPage() {
                             <div className="flex flex-wrap items-center gap-2 mt-2">
 
                                 {/* bulles */}
-                                {interests.map((item, index) => (
+                                {interests.map((interest, interestIndex) => (
                                     <div
-                                        key={index}
+                                        key={interestIndex}
                                         className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#EEF3FB] text-sm text-zinc-700"
                                     >
-                                        <span>{item}</span>
+                                        <span>{interest}</span>
 
                                         <button
                                             type="button"
-                                            onClick={() => removeInterest(index)}
+                                            onClick={() => removeInterest(interestIndex)}
                                             className="text-zinc-500 hover:text-red-500"
                                         >
                                             ✕
@@ -249,12 +249,8 @@ export default function ProfilPage() {
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
                                                 e.preventDefault();
-
-                                                const value = interestInput.trim();
-                                                if (!value) return;
-
-                                                setInterests([...interests, value]);
-                                                setInterestInput("");
+                                                if (!interestInput.trim()) return;
+                                                addInterest();
                                                 setShowInterestInput(false); // on referme après ajout
                                             }
                                         }}
@@ -265,11 +261,8 @@ export default function ProfilPage() {
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            const value = interestInput.trim();
-                                            if (!value) return;
-
-                                            setInterests([...interests, value]);
-                                            setInterestInput("");
+                                            if (!interestInput.trim()) return;
+                                            addInterest();
                                             setShowInterestInput(false);
                                         }}
                                         className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#152646] text-white"
@@ -289,15 +282,15 @@ export default function ProfilPage() {
                             <p className="text-sm font-medium text-zinc-500">Historique de mon activité</p>
                         </div>
 
-                        {myOutings.length === 0 ? (
-                            <p className="text-sm text-zinc-400">Aucune sortie pour le moment.</p>
+                        {activity.length === 0 ? (
+                            <p className="text-sm text-zinc-400">Aucune activité pour le moment.</p>
                         ) : (
                             <ul className="flex flex-col gap-2 w-full">
-                                {myOutings.map((o) => (
-                                    <li key={o.id} className="flex justify-between items-center rounded-xl bg-zinc-100 px-4 py-3">
-                                        <span className="text-sm font-medium text-zinc-900">{o.title}</span>
+                                {activity.map((activityEntry, activityIndex) => (
+                                    <li key={activityIndex} className="flex justify-between items-center rounded-xl bg-zinc-100 px-4 py-3">
+                                        <span className="text-sm font-medium text-zinc-900">{activityEntry.label}</span>
                                         <span className="text-xs text-zinc-500">
-                                            {new Date(o.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
+                                            {new Date(activityEntry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
                                         </span>
                                     </li>
                                 ))}
@@ -307,7 +300,19 @@ export default function ProfilPage() {
 
                 </div>
 
-
+                {/* BAS DE PAGE */}
+                <div className="w-full flex flex-col gap-3 mt-8">
+                    {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+                    {success && <p className="text-sm text-green-600 text-center">{success}</p>}
+                    <button
+                        type="submit"
+                        form="profile-form"
+                        disabled={isLoading}
+                        className="w-full rounded-lg bg-[#152646] px-4 py-2.5 text-sm font-medium text-white cursor-pointer hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? "Enregistrement..." : "Enregistrer"}
+                    </button>
+                </div>
 
             </main>
         </div>

@@ -1,6 +1,6 @@
 import { request } from "./_http";
 
-type GroupOut = { id: string; name: string; lieu: string };
+type GroupOut = { id: string; name: string; lieu: string; maxMembers: number };
 type MemberOut = { id: string; firstName: string; lastName: string; avatarUrl: string | null; createdAt?: string; interests?: string[] };
 
 type GroupMembersOut = { members: MemberOut[] };

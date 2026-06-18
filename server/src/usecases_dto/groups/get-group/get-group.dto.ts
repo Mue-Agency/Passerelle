@@ -7,9 +7,10 @@ export const GetGroupDtoIn = z.object({
 export type GetGroupDtoIn = z.output<typeof GetGroupDtoIn>;
 
 export const GetGroupDtoOut = z.object({
-  id:   z.string(),
-  name: z.string(),
-  lieu: z.string(),
+  id:         z.string(),
+  name:       z.string(),
+  lieu:       z.string(),
+  maxMembers: z.number(),
 });
 
 export type GetGroupDtoOut = z.output<typeof GetGroupDtoOut>;
