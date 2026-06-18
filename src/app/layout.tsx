@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Passerelle",
-  description: "Application passerelle",
+  title: "Alouette",
+  description: "Retrouvez les personnes que vous croisez dans votre quartier et tissez du lien.",
   icons: { icon: "/plume.svg" },
 };
 

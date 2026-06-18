@@ -3,7 +3,7 @@ import { z } from "zod";
 export const RegisterDtoIn = z.object({
   firstName: z.string().min(1).max(50),
   lastName:  z.string().min(1).max(50),
-  password:  z.string().min(6),
+  password:  z.string().min(6).max(72),
   groupId:   z.string().min(1).optional(),
 });
 
