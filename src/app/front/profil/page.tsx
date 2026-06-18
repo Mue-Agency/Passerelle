@@ -22,6 +22,7 @@ export default function ProfilPage() {
     const [interestInput, setInterestInput] = useState("");
     const [interests, setInterests] = useState<string[]>([]);
     const [activity, setActivity] = useState<ProfileActivity[]>([]);
+    const [showAllActivity, setShowAllActivity] = useState(false);
 
     useEffect(() => {
         usersService.getMe().then((meResponse) => {
@@ -285,23 +286,55 @@ export default function ProfilPage() {
                         {activity.length === 0 ? (
                             <p className="text-sm text-zinc-400">Aucune activité pour le moment.</p>
                         ) : (
-                            <ul className="flex flex-col gap-2 w-full">
-                                {activity.map((activityEntry, activityIndex) => (
-                                    <li key={activityIndex} className="flex justify-between items-center rounded-xl bg-zinc-100 px-4 py-3">
-                                        <span className="text-sm font-medium text-zinc-900">{activityEntry.label}</span>
-                                        <span className="text-xs text-zinc-500">
-                                            {new Date(activityEntry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
-                                        </span>
-                                    </li>
+                            <div className="flex flex-col w-full">
+                                {(showAllActivity ? activity : activity.slice(0, 3)).map((activityEntry, activityIndex, arr) => (
+                                    <div key={activityIndex} className="flex gap-3">
+                                        {/* Colonne gauche : icône + ligne verticale */}
+                                        <div className="flex flex-col items-center">
+                                            <div className="w-9 h-9 rounded-xl bg-[#E3EBF9] flex items-center justify-center flex-shrink-0">
+                                                {activityEntry.type === "PARTICIPATION" && (
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                                )}
+                                                {activityEntry.type === "PROPOSED" && (
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                                )}
+                                                {activityEntry.type === "JOIN" && (
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#152646" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                                                )}
+                                            </div>
+                                            {activityIndex < arr.length - 1 && (
+                                                <div className="w-px flex-1 bg-zinc-200 my-1" />
+                                            )}
+                                        </div>
+                                        {/* Carte */}
+                                        <div className="flex-1 mb-3">
+                                            <div className="rounded-xl border border-[#152646] bg-white px-4 py-3">
+                                                <p className="text-sm text-left text-zinc-900" dangerouslySetInnerHTML={{ __html: activityEntry.label.replace(/«(.+?)»/g, '<strong>$1</strong>') }} />
+                                                <p className="text-xs text-left text-zinc-500 mt-1">
+                                                    {new Date(activityEntry.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
-                            </ul>
+                                {activity.length > 3 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAllActivity(prev => !prev)}
+                                        className="flex items-center gap-2 text-sm text-zinc-500 font-medium mt-1 hover:opacity-70 transition cursor-pointer"
+                                    >
+                                        <span className="text-lg leading-none">+</span>
+                                        {showAllActivity ? "Voir moins" : "Voir plus"}
+                                    </button>
+                                )}
+                            </div>
                         )}
                     </div>
 
                 </div>
 
                 {/* BAS DE PAGE */}
-                <div className="w-full flex flex-col gap-3 mt-8">
+                {/* <div className="w-full flex flex-col gap-3 mt-8">
                     {error && <p className="text-sm text-red-500 text-center">{error}</p>}
                     {success && <p className="text-sm text-green-600 text-center">{success}</p>}
                     <button
@@ -312,7 +345,7 @@ export default function ProfilPage() {
                     >
                         {isLoading ? "Enregistrement..." : "Enregistrer"}
                     </button>
-                </div>
+                </div> */}
 
             </main>
         </div>
