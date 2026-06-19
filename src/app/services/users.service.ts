@@ -49,11 +49,12 @@ export const usersService = {
   },
 
   uploadAvatar(file: File) {
-    const form = new FormData();
-    form.append("avatar", file);
+    // Le serveur lit le corps brut et détecte le type par magic bytes : on envoie
+    // les octets de l'image directement (pas de multipart/FormData, qui parasiterait
+    // la détection avec son en-tête de frontière).
     return request<UserProfile>("/api/users/me/avatar", {
       method: "POST",
-      body: form,
+      body: file,
     });
   },
 };

@@ -25,7 +25,12 @@ export function proxy(request: NextRequest) {
   }
 
   if (publicRoutes.includes(path) && authed) {
-    return NextResponse.redirect(new URL("/front/discu", request.url));
+    // Exception : /front avec un groupId = un membre déjà inscrit scanne un nouveau QR.
+    // On laisse passer pour qu'il rejoigne ce groupe et bascule dessus (géré dans la page).
+    const isNewQrScan = path === "/front" && request.nextUrl.searchParams.has("groupId");
+    if (!isNewQrScan) {
+      return NextResponse.redirect(new URL("/front/discu", request.url));
+    }
   }
 
   return NextResponse.next();

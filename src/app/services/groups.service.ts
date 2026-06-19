@@ -13,4 +13,10 @@ export const groupsService = {
   getGroupMembers(groupId: string) {
     return request<GroupMembersOut>(`/api/groups/${groupId}/members`);
   },
+
+  joinGroup(groupId: string) {
+    return request<{ groupId: string }>(`/api/groups/${groupId}/join`, {
+      method: "POST",
+    });
+  },
 };
